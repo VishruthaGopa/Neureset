@@ -10,14 +10,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize the date and time label
     initializeDateTimeLabel();
 
-    // Set alternating row colors using stylesheet
-    ui->listWidget->setStyleSheet("QListWidget { alternate-background-color: #d3d3d3; }");
-
     // Connect listWidget's itemClicked signal to handleListItemClicked slot
     connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::handleListItemClicked);
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::toggleMenuVisibility);
 
-    // menu button connections
+    // Menu button connections
     connect(ui->upButton, &QPushButton::pressed, this, &MainWindow::navigateUpMenu);
     connect(ui->downButton, &QPushButton::pressed, this, &MainWindow::navigateDownMenu);
 
@@ -94,10 +91,18 @@ void MainWindow::toggleMenuVisibility() {
     ui->listWidget->clear();
     
     if (!showMenuOptions) {
-        // Show the three menu options
-        ui->listWidget->addItem("NEW SESSION");
-        ui->listWidget->addItem("SESSION LOG");
-        ui->listWidget->addItem("TIME AND DATE");
+        // Define alternating colors
+        QColor color1(235, 235, 235); // Light gray
+        QColor color2(215, 215, 215); // Slightly darker gray
+
+        // Show the three menu options with alternating colors
+        QStringList options = {"NEW SESSION", "SESSION LOG", "TIME AND DATE"};
+        for (int i = 0; i < options.size(); ++i) {
+            QListWidgetItem *item = new QListWidgetItem(options[i]);
+            item->setBackground((i % 2 == 0) ? color1 : color2);
+            ui->listWidget->addItem(item);
+        }
+
     } else {
         // Show the current date and time
         QDateTime currentDateTime = QDateTime::currentDateTime();
