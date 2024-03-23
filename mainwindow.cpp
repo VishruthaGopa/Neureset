@@ -11,8 +11,13 @@ MainWindow::MainWindow(QWidget *parent)
     initializeDateTimeLabel();
 
     // Connect listWidget's itemClicked signal to handleListItemClicked slot
-    connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::handleListItemClicked);
+    connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::handleSelection);
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::toggleMenuVisibility);
+
+    connect(ui->okButton, &QPushButton::clicked, this, &MainWindow::handleSelection);
+    connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartButtonClicked);
+    connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
+    connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::onStopButtonClicked);
 
     // Menu button connections
     connect(ui->upButton, &QPushButton::pressed, this, &MainWindow::navigateUpMenu);
@@ -23,20 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::handleListItemClicked(QListWidgetItem *item) {
-    QString itemName = item->text();
-    if (itemName == "NEW SESSION") {
-        qInfo("NEW SESSION");
-
-    } else if (itemName == "SESSION LOG") {
-        qInfo("SESSION LOG");
-
-    } else if (itemName == "TIME AND DATE") {
-        qInfo("TIME AND DATE");
-
-    }
 }
 
 void MainWindow::navigateUpMenu() {
@@ -78,6 +69,47 @@ void MainWindow::navigateDownMenu() {
         ui->listWidget->setCurrentRow(currentIndex + 1);
     }
 }
+
+
+void MainWindow::handleSelection() {
+    // Get the currently selected item
+    QListWidgetItem* currentItem = ui->listWidget->currentItem();
+    if (!currentItem) {
+        qInfo("No item selected");
+        return;
+    }
+
+    QString selectedItemText = currentItem->text();
+
+    // Act based on the text of the currently selected item
+    if (selectedItemText == "NEW SESSION") {
+        // Logic for starting a new session
+        qInfo("Starting NEW SESSION...");
+    } else if (selectedItemText == "SESSION LOG") {
+        // Logic for showing session log
+        qInfo("Opening SESSION LOG...");
+    } else if (selectedItemText == "TIME AND DATE") {
+        // Logic for showing time and date info
+        qInfo("Showing TIME AND DATE...");
+    }
+}
+
+
+void MainWindow::onStartButtonClicked() {
+    // Starting a new session or resuming
+    qInfo("Session started/resume");
+}
+
+void MainWindow::onPauseButtonClicked() {
+    // pause session
+    qInfo("Session paused");
+}
+
+void MainWindow::onStopButtonClicked() {
+    // Stop and possibly reset the session
+    qInfo("Session stopped");
+}
+
 
 void MainWindow::initializeDateTimeLabel() {
     // Show the current date and time in the QLabel

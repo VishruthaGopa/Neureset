@@ -248,6 +248,27 @@
       </item>
      </layout>
     </widget>
+    <widget class="QPushButton" name="okButton">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>140</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
@@ -265,6 +286,32 @@
      <attribute name="title">
       <string>EEG Headset</string>
      </attribute>
+     <widget class="QPushButton" name="loseContactButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>101</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Lose Contact</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="establishContactButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>131</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Estabish Contact</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="adminPanel">
      <attribute name="title">

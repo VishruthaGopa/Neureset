@@ -23,10 +23,15 @@ private:
     bool showMenuOptions = false; 
     
 private slots:
-    void handleListItemClicked(QListWidgetItem *item);
     void navigateUpMenu();
     void navigateDownMenu();
     void toggleMenuVisibility();
+
+    void onStartButtonClicked();
+    void onPauseButtonClicked();
+    void onStopButtonClicked();
+
+    void handleSelection();
 
 };
 #endif // MAINWINDOW_H
