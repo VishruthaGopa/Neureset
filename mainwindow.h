@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidget>
+#include <QDateTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,5 +19,14 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void initializeDateTimeLabel();
+    bool showMenuOptions = false; 
+    
+private slots:
+    void handleListItemClicked(QListWidgetItem *item);
+    void navigateUpMenu();
+    void navigateDownMenu();
+    void toggleMenuVisibility();
+
 };
 #endif // MAINWINDOW_H
