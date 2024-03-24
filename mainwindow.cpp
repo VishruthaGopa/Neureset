@@ -10,6 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize the date and time label
     initializeDateTimeLabel();
 
+    // Start with dull signal lights
+    ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
+    ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+
+
     // Connect listWidget's itemClicked signal to handleListItemClicked slot
     connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::handleSelection);
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::toggleMenuVisibility);
@@ -22,6 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Menu button connections
     connect(ui->upButton, &QPushButton::pressed, this, &MainWindow::navigateUpMenu);
     connect(ui->downButton, &QPushButton::pressed, this, &MainWindow::navigateDownMenu);
+
+    // Connect EEG headset panel buttons
+    connect(ui->establishContactButton, &QPushButton::clicked, this, &MainWindow::handleEEGHeadsetPanel);
+    connect(ui->loseContactButton, &QPushButton::clicked, this, &MainWindow::handleEEGHeadsetPanel);
+
 
 }
 
@@ -100,18 +111,18 @@ void MainWindow::onStartButtonClicked() {
     // Starting a new session or resuming
     qInfo("Session started/resume");
     ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
-    ui->treatmentLight->setStyleSheet("background-color: #60B115;"); // brighter green
-    ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
-
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+    //greenTreatmentSignal(); //just testing here
 }
+
+void MainWindow::greenTreatmentSignal() {
+    ui->treatmentLight->setStyleSheet("background-color: #60B115;"); // brighter green
+}
+
 
 void MainWindow::onPauseButtonClicked() {
     // pause session
     qInfo("Session paused");
-    ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
-    ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
-    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-
 }
 
 void MainWindow::onStopButtonClicked() {
@@ -119,6 +130,23 @@ void MainWindow::onStopButtonClicked() {
     qInfo("Session stopped");
 }
 
+
+void MainWindow::handleEEGHeadsetPanel() {
+    QPushButton *button = qobject_cast<QPushButton*>(sender());
+
+    if (button == ui->establishContactButton) {
+        // Logic for establishing contact with EEG headset
+        qInfo("Establishing contact with EEG headset...");
+        onStartButtonClicked();
+
+    } else if (button == ui->loseContactButton) {
+        // Logic for losing contact with EEG headset
+        qInfo("Losing contact with EEG headset...");
+        ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
+        ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
+
+    }
+}
 
 void MainWindow::initializeDateTimeLabel() {
     // Show the current date and time in the QLabel

@@ -21,6 +21,7 @@ private:
     Ui::MainWindow *ui;
     void initializeDateTimeLabel();
     bool showMenuOptions = false; 
+    void greenTreatmentSignal();
     
 private slots:
     void navigateUpMenu();
@@ -32,6 +33,7 @@ private slots:
     void onStopButtonClicked();
 
     void handleSelection();
+    void handleEEGHeadsetPanel();
 
 };
 #endif // MAINWINDOW_H
