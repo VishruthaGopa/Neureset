@@ -85,6 +85,7 @@ void MainWindow::handleSelection() {
     if (selectedItemText == "NEW SESSION") {
         // Logic for starting a new session
         qInfo("Starting NEW SESSION...");
+        onStartButtonClicked();
     } else if (selectedItemText == "SESSION LOG") {
         // Logic for showing session log
         qInfo("Opening SESSION LOG...");
@@ -98,11 +99,19 @@ void MainWindow::handleSelection() {
 void MainWindow::onStartButtonClicked() {
     // Starting a new session or resuming
     qInfo("Session started/resume");
+    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
+    ui->treatmentLight->setStyleSheet("background-color: #60B115;"); // brighter green
+    ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
+
 }
 
 void MainWindow::onPauseButtonClicked() {
     // pause session
     qInfo("Session paused");
+    ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
+    ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+
 }
 
 void MainWindow::onStopButtonClicked() {

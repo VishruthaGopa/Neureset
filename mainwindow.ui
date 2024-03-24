@@ -179,7 +179,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #20a7db;</string>
+      <string notr="true">background-color: #e4f0fa;</string>
      </property>
      <property name="text">
       <string/>
@@ -195,7 +195,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #4ca64c;</string>
+      <string notr="true">background-color: #ddf3c8;</string>
      </property>
      <property name="text">
       <string/>
@@ -211,7 +211,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #ff4c4c;</string>
+      <string notr="true">background-color: #ffcccf;</string>
      </property>
      <property name="text">
       <string/>
