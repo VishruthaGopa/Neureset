@@ -6,7 +6,8 @@ PC::PC(QObject *parent): QObject{parent}{
 }
 
 void PC::saveSession(){
-
+    // data structure??
+    // text file maybe
 }
 
 bool PC::getConnect(){ return isConnected; }
