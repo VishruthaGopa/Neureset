@@ -45,8 +45,7 @@ signals:
     void sessionPaused();
     void sessionResumed();
     void sessionEnded();
-private slots:
-    void onBaselineCalculationFinished();
+
 };
 
 
