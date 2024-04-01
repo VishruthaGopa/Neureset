@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include<QRandomGenerator>
 #include <QDebug>
 #include "session.h"
 
@@ -15,9 +16,17 @@ private:
     double treatmentDuration;
     double timeElapsed;
     QTimer* treatmentTimer;
-    Session *session;
 
 public:
+    enum BrainWaveType {
+           Delta,
+           Theta,
+           Alpha,
+           Beta,
+           Gamma,
+           TotalBrainWaveTypes //track the total number of brainwave types
+     };
+
     Electrode(int id, QObject* parent = nullptr);
 
     // Setter methods
@@ -40,11 +49,16 @@ public:
     // Apply treatment
     void applyTreatment();
 
+
+    // Function to generate a random brainwave frequency
+    static double generateBrainFrequency() ;
+
 private slots:
     void onTreatmentTimerTimeout();
 
 signals:
-    void treatmentApplied(Session *session);
+    void treatmentApplied(double fre);
+    void baselineMeasured(double fre);
 
 };
 
