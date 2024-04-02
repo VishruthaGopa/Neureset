@@ -11,6 +11,8 @@ EEGHeadset::EEGHeadset(QObject* parent) : QObject(parent) {
        }
        //set the for the first electrode
        currElectrode=1;
+       calculationTimer=new QTimer();
+       QObject::connect(calculationTimer,&QTimer::timeout,&loop,&QEventLoop::quit);
 }
 
 
@@ -33,12 +35,14 @@ Electrode* EEGHeadset::getElectrodeSite(int index) const {
 
 
 
-bool EEGHeadset::treatNext(){
+bool EEGHeadset::treatNext(double frequency){
    if (currElectrode==1){
        session->startTimer();
    }
+   electrodeSites[currElectrode-1]->setOffsetFrequency(frequency);
    electrodeSites[currElectrode-1]->applyTreatment();
    if(currElectrode==21){
+       currElectrode=1;
        return false;
    }
    else{
@@ -50,16 +54,22 @@ bool EEGHeadset::treatNext(){
 
 void EEGHeadset::startMeasurement() {
   session->startTimer();
-  // Start baseline measurement for each electrode
-  for (int i = 0; i < electrodeSites.size(); ++i) {
-      QThread *thread = new QThread;
-      electrodeSites[i]->moveToThread(thread);
-      connect(thread, &QThread::started, electrodeSites[i], &Electrode::calculateBaseline);
-      connect(electrodeSites[i], &Electrode::baselineMeasured, thread, &QThread::quit);
-      connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-      connect(thread, &QThread::finished, electrodeSites[i], &QObject::deleteLater);
-      thread->start();
-  }
+  calculationTimer->start(1000);
+  loop.exec();
+  // Use a QFutureWatcher to monitor the completion of the futures
+  QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+  connect(watcher, &QFutureWatcher<void>::finished, [=]() {
+      watcher->deleteLater(); // Clean up QFutureWatcher
+  });
+
+  // Concurrently call processObject on each object
+  QFuture<void> future = QtConcurrent::map(electrodeSites, [this](Electrode *obj) {
+      obj->calculateBaseline();
+  });
+
+  // Set the future for the watcher
+  watcher->setFuture(future);
+
 }
 
 void EEGHeadset::handleBaseline(double frequency) {
@@ -77,14 +87,11 @@ void EEGHeadset::handleBaseline(double frequency) {
 
 void EEGHeadset::handleTreatmentApplied(double frequency){
    afterFrequencies.append(frequency);
-   if (afterFrequencies.size() == 21) {
+   if (afterFrequencies.size() == 84) {
        session->endTimer();
-       // All baselines measured, calculate average
-       double sum = 0;
-       foreach (double freq, afterFrequencies) {
-           sum += freq;
-       }
-       double average = sum / afterFrequencies.size();
+       qDebug()<<afterFrequencies;
+       double average = calculateDominantFrequency(afterFrequencies);
+       session->setBeforeBaseline(average);
        session->setAfterBaseline(average);
        qDebug() << "Average after frequency:" << average;
        emit newSession(session);
@@ -96,39 +103,46 @@ void EEGHeadset::createNewSession(){
 }
 
 /*
-This function takes a vector of frequencies as input and returns the dominant frequency.
-It creates a signal vector by converting each frequency to a complex number.
-Then it performs FFT on the signal vector. It finds the index of the maximum magnitude in the FFT result (excluding the DC component at index 0).
-Finally, it calculates the dominant frequency using the index of the maximum magnitude and the sample rate.
+The function dftMagnitudeSpectrum calculates the Discrete Fourier Transform (DFT) of a time-domain signal represented by a QVector<double>.
+It iterates over each frequency component, computing the DFT coefficient using the DFT formula.
+Then, it computes the magnitude spectrum by taking the absolute value of each DFT coefficient.
+Finally, it identifies the dominant frequency by finding the index with the maximum magnitude
+in the magnitude spectrum and returns the corresponding frequency from the original list.
+This function provides a way to analyze the frequency content of a signal and determine its dominant frequency component.
 
 */
 double EEGHeadset::calculateDominantFrequency(const QVector<double> &frequencies) {
     int N = frequencies.size();
-    QVector<Complex> signal(N);
+        QVector<std::complex<double>> X(N);
 
-    // Populate the signal vector with complex numbers
-    for (int i = 0; i < N; ++i) {
-        signal[i] = Complex(frequencies[i], 0.0);
-    }
-
-    // Perform FFT
-    QVector<Complex> fftResult = fft(signal);
-
-    // Find the index of the maximum magnitude in the FFT result
-    int maxIndex = 0;
-    double maxMagnitude = 0.0;
-    for (int i = 1; i < N / 2; ++i) { // Start from index 1 to skip the DC component at index 0
-        double magnitude = sqrt(pow(fftResult[i].real, 2) + pow(fftResult[i].imag, 2));
-        if (magnitude > maxMagnitude) {
-            maxMagnitude = magnitude;
-            maxIndex = i;
+        // Compute DFT
+        for (int k = 0; k < N; ++k) {
+            std::complex<double> sum = 0;
+            for (int n = 0; n < N; ++n) {
+                sum += frequencies[n] * std::exp(std::complex<double>(0, -2 * M_PI * k * n / N));
+            }
+            X[k] = sum;
         }
-    }
 
-    // Calculate dominant frequency
-    double sampleRate = 200; // Sample rate in Hz (as recommmended sample rate is  double max Frequency)
-    double dominantFrequency = maxIndex * sampleRate / N;
+        // Compute magnitude spectrum
+        QVector<double> magnitudes(N);
+        for (int k = 0; k < N; ++k) {
+            magnitudes[k] = std::abs(X[k]);
+        }
 
-    return dominantFrequency;
+        // Find index of max magnitude
+        double maxMagnitude = magnitudes[0];
+        int maxIndex = 0;
+        for (int k = 1; k < N; ++k) {
+            if (magnitudes[k] > maxMagnitude) {
+                maxMagnitude = magnitudes[k];
+                maxIndex = k;
+            }
+        }
+
+        return frequencies[maxIndex];
 }
+
+
+
 
