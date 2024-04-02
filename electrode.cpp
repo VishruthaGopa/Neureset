@@ -42,7 +42,7 @@ void Electrode::onTreatmentTimerTimeout() {
 
     if (timeElapsed >= treatmentDuration) {
         treatmentTimer->stop();
-        qInfo("Treatment applied for electrode %d", id);
+        qInfo("Treatment applied for electrode %d at %f", id,offsetFrequency);
         emit treatmentApplied(baselineFrequency);
     }
 }
