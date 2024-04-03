@@ -192,7 +192,7 @@ void MainWindow::updateProgress(int progress){
     ui->progressBar->setValue(progress);
     // If percentage reaches 100%, change the background color to light green and font color to white
     if (progress == 100) {
-        ui->progressBar->setStyleSheet("QProgressBar { background-color: lightgreen; color: white; }"
+        ui->progressBar->setStyleSheet("QProgressBar { background-color: lightgreen; color: white;text-align: center; }"
                                     "QProgressBar::chunk { background-color: green; text-align: center; }");
     } else {
         // Reset the stylesheet to default if the progress is not 100%
