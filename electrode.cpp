@@ -37,12 +37,14 @@ void Electrode::applyTreatment() {
 
 // Handle adding offset
 void Electrode::onTreatmentTimerTimeout() {
-    baselineFrequency += offsetFrequency;
+    baselineFrequency = abs(baselineFrequency-offsetFrequency);
+    //When you add two phrequencies you observe beat phenomina, which results in the
+    //new dominent frequency is the difference of the two
     timeElapsed += 0.062; // Increment by 1/16th of a second (0.062 seconds)
 
     if (timeElapsed >= treatmentDuration) {
         treatmentTimer->stop();
-        qInfo("Treatment applied for electrode %d at %f", id,offsetFrequency);
+        qInfo("Treatment applied for electrode %d at %d", id,static_cast<int>(offsetFrequency));
         emit treatmentApplied(baselineFrequency);
     }
 }
