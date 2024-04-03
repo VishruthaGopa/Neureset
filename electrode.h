@@ -5,6 +5,7 @@
 #include <QTimer>
 #include<QRandomGenerator>
 #include <QDebug>
+#include <QEventLoop>
 #include "session.h"
 
 class Electrode : public QObject {
