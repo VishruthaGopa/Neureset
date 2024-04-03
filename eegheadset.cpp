@@ -36,9 +36,6 @@ Electrode* EEGHeadset::getElectrodeSite(int index) const {
 
 
 bool EEGHeadset::treatNext(double frequency){
-   if (currElectrode==1){
-       session->startTimer();
-   }
    electrodeSites[currElectrode-1]->setOffsetFrequency(frequency);
    electrodeSites[currElectrode-1]->applyTreatment();
    if(currElectrode==21){
@@ -75,8 +72,7 @@ void EEGHeadset::startMeasurement() {
 void EEGHeadset::handleBaseline(double frequency) {
   baselineFrequencies.append(frequency);
   if (baselineFrequencies.size() == 21) {
-      // All baselines measured, calculate average
-      qDebug()<<baselineFrequencies;
+      // All baselines measured, calculate dominent
       double average = calculateDominantFrequency(baselineFrequencies);
       session->setBeforeBaseline(average);
       qDebug() << "Average baseline frequency:" << average;
@@ -88,12 +84,10 @@ void EEGHeadset::handleBaseline(double frequency) {
 void EEGHeadset::handleTreatmentApplied(double frequency){
    afterFrequencies.append(frequency);
    if (afterFrequencies.size() == 84) {
-       session->endTimer();
-       qDebug()<<afterFrequencies;
        double average = calculateDominantFrequency(afterFrequencies);
-       session->setBeforeBaseline(average);
        session->setAfterBaseline(average);
        qDebug() << "Average after frequency:" << average;
+       session->endTimer();
        emit newSession(session);
    }
 }
@@ -103,7 +97,7 @@ void EEGHeadset::createNewSession(){
 }
 
 /*
-The function dftMagnitudeSpectrum calculates the Discrete Fourier Transform (DFT) of a time-domain signal represented by a QVector<double>.
+The function calculateDominantFrequency calculates the Discrete Fourier Transform (DFT) of a time-domain signal represented by a QVector<double>.
 It iterates over each frequency component, computing the DFT coefficient using the DFT formula.
 Then, it computes the magnitude spectrum by taking the absolute value of each DFT coefficient.
 Finally, it identifies the dominant frequency by finding the index with the maximum magnitude
