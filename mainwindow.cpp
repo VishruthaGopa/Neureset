@@ -6,7 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    eegheadset=new EEGHeadset();
+    neureset=new NeuresetDevice(eegheadset);
     // Initialize the date and time label
     initializeDateTimeLabel();
 
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
     ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
     ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-
+    ui->progressBar->setValue(0);
 
     // Connect listWidget's itemClicked signal to handleListItemClicked slot
     connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::handleSelection);
@@ -32,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect EEG headset panel buttons
     connect(ui->establishContactButton, &QPushButton::clicked, this, &MainWindow::handleEEGHeadsetPanel);
     connect(ui->loseContactButton, &QPushButton::clicked, this, &MainWindow::handleEEGHeadsetPanel);
+
+    connect(neureset,&NeuresetDevice::sessionProgress,this,&MainWindow::updateProgress);
 
 
 }
@@ -112,6 +115,7 @@ void MainWindow::onStartButtonClicked() {
     qInfo("Session started/resume");
     ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
     ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+    neureset->startSession();
     //greenTreatmentSignal(); //just testing here
 }
 
@@ -123,6 +127,7 @@ void MainWindow::greenTreatmentSignal() {
 void MainWindow::onPauseButtonClicked() {
     // pause session
     qInfo("Session paused");
+    neureset->pauseSession();
 }
 
 void MainWindow::onStopButtonClicked() {
@@ -181,4 +186,21 @@ void MainWindow::toggleMenuVisibility() {
 
     // Toggle the flag for the next call
     showMenuOptions = !showMenuOptions;
+}
+
+void MainWindow::updateProgress(int progress){
+    ui->progressBar->setValue(progress);
+    // If percentage reaches 100%, change the background color to light green and font color to white
+    if (progress == 100) {
+        ui->progressBar->setStyleSheet("QProgressBar { background-color: lightgreen; color: white; }"
+                                    "QProgressBar::chunk { background-color: green; text-align: center; }");
+    } else {
+        // Reset the stylesheet to default if the progress is not 100%
+        ui->progressBar->setStyleSheet("");
+    }
+
+
+
+
+
 }
