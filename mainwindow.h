@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QListWidget>
 #include <QDateTime>
+#include "neuresetdevice.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,8 @@ private:
     void initializeDateTimeLabel();
     bool showMenuOptions = false; 
     void greenTreatmentSignal();
+    EEGHeadset *eegheadset;
+    NeuresetDevice* neureset;
     
 private slots:
     void navigateUpMenu();
@@ -33,6 +36,7 @@ private slots:
     void onStopButtonClicked();
 
     void handleSelection();
+    void updateProgress(int progress);
     void handleEEGHeadsetPanel();
 
 };
