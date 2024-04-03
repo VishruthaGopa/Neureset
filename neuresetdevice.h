@@ -30,6 +30,9 @@ private:
     int stage4;
     QList<QFuture<QPair<Electrode*, double>>> baselineFutures;
     QFutureWatcher<QPair<Electrode*, double>>* watcher;
+    int percentage;
+    int totalEvents;
+    int currEvents;
     void calculateOverallBaseline();
     void stopTreatment();
 
@@ -45,6 +48,8 @@ public:
     void resumeSession();
     void treatNextHandler();
 
+signals:
+     void sessionProgress(int percentage);
 
 };
 
