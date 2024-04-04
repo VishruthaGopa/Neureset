@@ -102,6 +102,7 @@ void MainWindow::handleSelection() {
         onStartButtonClicked();
     } else if (selectedItemText == "SESSION LOG") {
         // Logic for showing session log
+        onSessionLogRequested();
         qInfo("Opening SESSION LOG...");
     } else if (selectedItemText == "TIME AND DATE") {
         // Logic for showing time and date info
@@ -109,7 +110,25 @@ void MainWindow::handleSelection() {
     }
 }
 
+void MainWindow::onSessionLogRequested(){
+     showMenuOptions = !showMenuOptions;
+    //clear screen of menu choices
+    ui->listWidget->clear();
+    QString sessionDataString;
 
+    for (Session *session : neureset->getSessionLog()->getSessionHistory()) {
+        sessionDataString += QString("Start Time: %1, End Time: %2, Before Baseline: %3, After Baseline: %4\n")
+                .arg(session->getStartTime().toString())
+                .arg(session->getEndTime().toString())
+                .arg(session->getBeforeBaseline())
+                .arg(session->getAfterBaseline());
+    }
+    if(sessionDataString.isEmpty()){
+        sessionDataString=QString("NO LOGGED SESSIONS");
+    }
+    //display session data
+    ui->listWidget->addItem(sessionDataString);
+}
 void MainWindow::onStartButtonClicked() {
     // Starting a new session or resuming
     qInfo("Session started/resume");
@@ -160,10 +179,12 @@ void MainWindow::initializeDateTimeLabel() {
     ui->listWidget->addItem(dateTimeString);
 }
 
+
+
 void MainWindow::toggleMenuVisibility() {
     // Clear the listWidget contents in any case
     ui->listWidget->clear();
-    
+
     if (!showMenuOptions) {
         // Define alternating colors
         QColor color1(235, 235, 235); // Light gray
@@ -198,9 +219,4 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
-
-
-
-
-
 }
