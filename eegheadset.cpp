@@ -6,9 +6,14 @@ EEGHeadset::EEGHeadset(QObject* parent) : QObject(parent) {
        for (int i = 1; i < 22; ++i) {
            Electrode* electrode=new Electrode(i);
            electrodeSites.append(electrode);
-           QObject::connect(electrode,&Electrode::treatmentApplied,this,&EEGHeadset::handleTreatmentApplied);
+       }
+
+
+       for (Electrode *electrode : electrodeSites) {
+           QObject::connect(electrode, &Electrode::treatmentApplied, this, &EEGHeadset::handleTreatmentApplied);
            QObject::connect(electrode,&Electrode::baselineMeasured,this,&EEGHeadset::handleBaseline);
        }
+
        //set the for the first electrode
        currElectrode=1;
        calculationTimer=new QTimer();
@@ -51,8 +56,6 @@ bool EEGHeadset::treatNext(double frequency){
 
 void EEGHeadset::startMeasurement() {
   session->startTimer();
-  calculationTimer->start(1000);
-  loop.exec();
   // Use a QFutureWatcher to monitor the completion of the futures
   QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
   connect(watcher, &QFutureWatcher<void>::finished, [=]() {
@@ -71,6 +74,7 @@ void EEGHeadset::startMeasurement() {
 
 void EEGHeadset::handleBaseline(double frequency) {
   baselineFrequencies.append(frequency);
+
   if (baselineFrequencies.size() == 21) {
       // All baselines measured, calculate dominent
       double average = calculateDominantFrequency(baselineFrequencies);
@@ -83,12 +87,18 @@ void EEGHeadset::handleBaseline(double frequency) {
 
 void EEGHeadset::handleTreatmentApplied(double frequency){
    afterFrequencies.append(frequency);
+   //qDebug()<<afterFrequencies.size();
    if (afterFrequencies.size() == 84) {
        double average = calculateDominantFrequency(afterFrequencies);
        session->setAfterBaseline(average);
        qDebug() << "Average after frequency:" << average;
        session->endTimer();
        emit newSession(session);
+       createNewSession();
+       afterFrequencies.clear();
+       baselineFrequencies.clear();
+       currElectrode=1;
+
    }
 }
 
