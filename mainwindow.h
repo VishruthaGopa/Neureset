@@ -34,7 +34,7 @@ private slots:
     void onStartButtonClicked();
     void onPauseButtonClicked();
     void onStopButtonClicked();
-
+    void onSessionLogRequested();
     void handleSelection();
     void updateProgress(int progress);
     void handleEEGHeadsetPanel();
