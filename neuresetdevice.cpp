@@ -76,6 +76,8 @@ void NeuresetDevice::endSession(){
         stage2=0;
         stage3=0;
         stage4=0;
+        percentage=0;
+        currEvents=0;
         stopTreatment();
     }
     else{
