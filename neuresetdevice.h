@@ -21,11 +21,19 @@ class NeuresetDevice : public QObject {
 private:
     EEGHeadset* eegHeadset;
     bool sessionInProgress;
-    Counter* sessionTimer;
+    bool sessionPaused;
+    QTimer* sessionTimer;
+    QTimer* pauseTimer;
+    QTimer* percentageTimer;
     SessionLog* sessionLog;
+    int stage;
     QList<QFuture<QPair<Electrode*, double>>> baselineFutures;
     QFutureWatcher<QPair<Electrode*, double>>* watcher;
+    int percentage;
+    int totalEvents;
+    int currEvents;
     void calculateOverallBaseline();
+    void stopTreatment();
 
 
 
@@ -33,20 +41,19 @@ public:
     NeuresetDevice(EEGHeadset* headset, QObject* parent = nullptr);
     void startSession();  
     SessionLog* getSessionLog() const { return sessionLog; }
-
-public slots:
+    void gotNewSession(Session* session);
+    void endSession();
     void pauseSession();
     void resumeSession();
-    void endSession();
-    void gotNewSession(Session* session);
+    void cancelSession();
+    void handlePercentage();
+    void onTreatmentCompleted(double frequency);
+    void measurementHandler();
+    void treatNextHandler(double frequency);
 
 signals:
-    void sessionStarted();
-    void sessionPaused();
-    void sessionResumed();
-    void sessionEnded();
-private slots:
-    void onBaselineCalculationFinished();
+     void sessionProgress(int percentage);
+
 };
 
 
