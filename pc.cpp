@@ -5,9 +5,12 @@ PC::PC(QObject *parent): QObject{parent}{
     isConnected = false;
 }
 
-void PC::saveSession(){
-    // data structure??
-    // text file maybe
+void PC::save(const QDateTime &s, const QDateTime &e, const QMap<int, double> &b, const QMap<int, double> &a){
+    pcDB.saveSession(s, e, b, a);
+}
+
+QList<QString>* PC::getData(){
+    return pcDB.getSessions();
 }
 
 bool PC::getConnect(){ return isConnected; }
