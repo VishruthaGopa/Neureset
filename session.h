@@ -10,17 +10,19 @@ class Session : public QObject {
 private:
     QDateTime startTime;
     QDateTime endTime;
-    QMap<int, double> beforeBaseline;
-    QMap<int, double> afterBaseline;
+    double beforeBaseline;
+    double afterBaseline;
 ;
 public:
     Session(QObject *parent=nullptr);
     QDateTime getStartTime() const;
     QDateTime getEndTime() const;
-    QMap<int, double> getBeforeBaseline() const;
-    void setBeforeBaseline(const QMap<int, double>& baseline);
-    QMap<int, double> getAfterBaseline() const;
-    void setAfterBaseline(const QMap<int, double>& baseline);
+    double getBeforeBaseline() const;
+    void setBeforeBaseline(double baseline);
+    double getAfterBaseline() const;
+    void setAfterBaseline(double baseline);
+    void startTimer();
+    void endTimer();
 };
 
 #endif // SESSION_H
