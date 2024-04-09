@@ -4,8 +4,8 @@ const QString DBManager::DATE_FORMAT = "yyyy-MM-dd hh:mm";
 
 DBManager::DBManager(){
     db = QSqlDatabase::addDatabase("QSQLITE");
-//    db.setDatabaseName("neureset.db");
-    db.setDatabaseName("test.db");
+   db.setDatabaseName("neureset.db");
+    // db.setDatabaseName("test.db");
 
     qInfo("Instantiating database...");
 
