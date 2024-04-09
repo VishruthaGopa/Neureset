@@ -1,10 +1,20 @@
 #ifndef ELECTRODE_H
 #define ELECTRODE_H
-
 #include <QObject>
 #include <QTimer>
-#include <QDebug>
+#include<QRandomGenerator>
+#include <QEventLoop>
 #include "session.h"
+#include <complex>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <QDebug>
+#include <QCoreApplication>
+#include <QtMath>
+#include <QVector>
+#include <QtCharts>
+
 
 class Electrode : public QObject {
     Q_OBJECT
@@ -14,10 +24,15 @@ private:
     double offsetFrequency;
     double treatmentDuration;
     double timeElapsed;
-    QTimer* treatmentTimer;
-    Session *session;
+    double samplingFrequency; // Sampling frequency
+    double duration; // Duration of the waveform
+    std::vector<double> waveform; // Alpha brain wave generated
+    QtCharts::QChartView *chartView;
+    QtCharts::QChart *chart;
+    QtCharts::QLineSeries *series;
 
 public:
+    const double PI = 3.14159265358979323846;
     Electrode(int id, QObject* parent = nullptr);
 
     // Setter methods
@@ -40,11 +55,20 @@ public:
     // Apply treatment
     void applyTreatment();
 
-private slots:
-    void onTreatmentTimerTimeout();
+
+    void generateAlphaWave();
+    void generateDeltaWave();
+    void generateBetaWave();
+    void generateThetaWave();
+    void generateGammaWave();
+
+    void generateBrainWaveFrequency();
+    double calculateDominantFrequency();
+    void plotWaveform() ;
 
 signals:
-    void treatmentApplied(Session *session);
+    void treatmentApplied(double fre);
+    void baselineMeasured(double fre);
 
 };
 
