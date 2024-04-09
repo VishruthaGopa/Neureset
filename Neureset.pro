@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,14 +10,28 @@ CONFIG += c++11
 
 SOURCES += \
     datamodel.cpp \
+    dbmanager.cpp \
     main.cpp \
     pc.cpp \
-    pcwindow.cpp
+    pcwindow.cpp \
+    sessionlog.cpp \
+    session.cpp \
+    neuresetdevice.cpp \
+    eegheadset.cpp \
+    electrode.cpp \
+    counter.cpp
 
 HEADERS += \
     datamodel.h \
+    dbmanager.h \
     pc.h \
-    pcwindow.h
+    pcwindow.h \
+    sessionlog.h \
+    session.h \
+    neuresetdevice.h \
+    eegheadset.h \
+    electrode.h \
+    counter.h
 
 FORMS += \
     pcwindow.ui
