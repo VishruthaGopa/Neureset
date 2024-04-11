@@ -14,7 +14,7 @@ class PC : public QObject
         // functions
         void transferSessions();
         void save(const QDateTime& start, const QDateTime& end, const QMap<int, double>& before, const QMap<int, double>& after);
-        QList<QString>* getData();
+        QVector<Data*>* getData();
         void setConnect(bool);
         bool getConnect();
 
