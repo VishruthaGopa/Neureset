@@ -12,6 +12,7 @@ class PC : public QObject
         explicit PC(QObject *parent = nullptr);
 
         // functions
+        void transferSessions();
         void save(const QDateTime& start, const QDateTime& end, const QMap<int, double>& before, const QMap<int, double>& after);
         QList<QString>* getData();
         void setConnect(bool);
