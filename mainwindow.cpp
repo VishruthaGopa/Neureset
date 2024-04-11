@@ -8,8 +8,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     eegheadset=new EEGHeadset();
     neureset=new NeuresetDevice(eegheadset);
-    // Initialize the date and time label
-    initializeDateTimeLabel();
+
+    powerOn = false;
+    deviceOff();
+
+    // Timer
+    //timerLabel();
+
+    // Enable the establish contact button
+    ui->establishContactButton->setEnabled(true);
+    ui->loseContactButton->setEnabled(false);
+
 
     // Start with dull signal lights
     ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
@@ -36,6 +45,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(neureset,&NeuresetDevice::sessionProgress,this,&MainWindow::updateProgress);
 
+    // Connect batterySlider signal to handleBatteryLevelChanged slot
+    connect(ui->batterySlider, &QSlider::sliderReleased, this, &MainWindow::handleBatteryLevelChanged);
+
+    // Connect Power On/Off signal
+    connect(ui->onoffButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
 }
 
@@ -161,7 +175,12 @@ void MainWindow::handleEEGHeadsetPanel() {
     if (button == ui->establishContactButton) {
         // Logic for establishing contact with EEG headset
         qInfo("Establishing contact with EEG headset...");
-        onStartButtonClicked();
+        //onStartButtonClicked();
+
+        // Enable the lose contact button
+        ui->loseContactButton->setEnabled(true);
+        ui->establishContactButton->setEnabled(false);
+
 
     } else if (button == ui->loseContactButton) {
         // Logic for losing contact with EEG headset
@@ -169,10 +188,15 @@ void MainWindow::handleEEGHeadsetPanel() {
         ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
         ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
 
+        // Enable the establish contact button
+        ui->establishContactButton->setEnabled(true);
+        ui->loseContactButton->setEnabled(false);
+
     }
 }
 
-void MainWindow::initializeDateTimeLabel() {
+void MainWindow::timerLabel() {
+    ui->listWidget->clear();
     // Show the current date and time in the QLabel
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString dateTimeString = currentDateTime.toString("MMM dd yyyy, hh:mm:ss");
@@ -199,10 +223,7 @@ void MainWindow::toggleMenuVisibility() {
         }
 
     } else {
-        // Show the current date and time
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        QString dateTimeString = currentDateTime.toString("MMM dd yyyy, hh:mm:ss");
-        ui->listWidget->addItem(dateTimeString);
+        timerLabel();    
     }
 
     // Toggle the flag for the next call
@@ -219,4 +240,36 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
+}
+
+// handle slider release and retrieve slider value
+void MainWindow::handleBatteryLevelChanged() {
+    int batteryLevel = ui->batterySlider->value();
+    qInfo("Battery Level: %d", batteryLevel);
+}
+
+void MainWindow::powerButtonClicked() {
+    // on/off device
+    qInfo("power button clicked");
+    powerOn = !powerOn; //Toggle powerOn when clicked
+
+    // Disable the frame when off
+    if (powerOn){
+        deviceOn();
+    }else{
+        deviceOff();   
+    }
+
+}
+
+void MainWindow::deviceOn(){
+    timerLabel();    
+    ui->frame->setEnabled(true);
+}
+
+void MainWindow::deviceOff(){
+    ui->listWidget->clear();
+    QString item = "Neureset Device is Off.";
+    ui->listWidget->addItem(item);
+    ui->frame->setEnabled(false);
 }

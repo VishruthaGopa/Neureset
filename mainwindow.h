@@ -20,11 +20,14 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    void initializeDateTimeLabel();
+    void timerLabel();
     bool showMenuOptions = false; 
     void greenTreatmentSignal();
     EEGHeadset *eegheadset;
     NeuresetDevice* neureset;
+    bool powerOn;
+    void deviceOff();
+    void deviceOn();
     
 private slots:
     void navigateUpMenu();
@@ -38,6 +41,7 @@ private slots:
     void handleSelection();
     void updateProgress(int progress);
     void handleEEGHeadsetPanel();
-
+    void handleBatteryLevelChanged();
+    void powerButtonClicked();
 };
 #endif // MAINWINDOW_H

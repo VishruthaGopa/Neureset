@@ -20,8 +20,8 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -39,8 +39,6 @@ public:
     QPushButton *pauseButton;
     QPushButton *startButton;
     QPushButton *stopButton;
-    QToolButton *batteryIndicator;
-    QToolButton *onoffButton;
     QLabel *contactLight;
     QLabel *treatmentLight;
     QLabel *contactLostLight;
@@ -49,11 +47,17 @@ public:
     QListWidget *listWidget;
     QProgressBar *progressBar;
     QPushButton *okButton;
-    QTabWidget *tabWidget;
-    QWidget *headsetPanel;
-    QPushButton *loseContactButton;
+    QFrame *line;
+    QFrame *panelFrame;
+    QLabel *label_4;
     QPushButton *establishContactButton;
-    QWidget *adminPanel;
+    QPushButton *loseContactButton;
+    QLabel *label_5;
+    QLabel *label_3;
+    QLabel *label;
+    QLabel *label_2;
+    QSlider *batterySlider;
+    QToolButton *onoffButton;
     QMenuBar *menubar;
     QMenu *menuNeureset;
     QStatusBar *statusbar;
@@ -62,7 +66,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(882, 480);
+        MainWindow->resize(890, 460);
         MainWindow->setStyleSheet(QString::fromUtf8(""));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
@@ -101,12 +105,6 @@ public:
         stopButton->setObjectName(QString::fromUtf8("stopButton"));
         stopButton->setGeometry(QRect(300, 250, 41, 25));
         stopButton->setFont(font1);
-        batteryIndicator = new QToolButton(frame);
-        batteryIndicator->setObjectName(QString::fromUtf8("batteryIndicator"));
-        batteryIndicator->setGeometry(QRect(530, 330, 29, 24));
-        onoffButton = new QToolButton(frame);
-        onoffButton->setObjectName(QString::fromUtf8("onoffButton"));
-        onoffButton->setGeometry(QRect(530, 10, 29, 24));
         contactLight = new QLabel(frame);
         contactLight->setObjectName(QString::fromUtf8("contactLight"));
         contactLight->setGeometry(QRect(10, 0, 16, 31));
@@ -151,25 +149,58 @@ public:
         font3.setBold(true);
         font3.setWeight(75);
         okButton->setFont(font3);
-        tabWidget = new QTabWidget(centralwidget);
-        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-        tabWidget->setGeometry(QRect(610, 10, 261, 371));
-        headsetPanel = new QWidget();
-        headsetPanel->setObjectName(QString::fromUtf8("headsetPanel"));
-        loseContactButton = new QPushButton(headsetPanel);
-        loseContactButton->setObjectName(QString::fromUtf8("loseContactButton"));
-        loseContactButton->setGeometry(QRect(20, 60, 101, 25));
-        establishContactButton = new QPushButton(headsetPanel);
+        line = new QFrame(centralwidget);
+        line->setObjectName(QString::fromUtf8("line"));
+        line->setGeometry(QRect(610, 10, 16, 391));
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Sunken);
+        panelFrame = new QFrame(centralwidget);
+        panelFrame->setObjectName(QString::fromUtf8("panelFrame"));
+        panelFrame->setGeometry(QRect(630, 10, 251, 371));
+        panelFrame->setStyleSheet(QString::fromUtf8("background-color: #f5f5f5;"));
+        panelFrame->setFrameShape(QFrame::StyledPanel);
+        panelFrame->setFrameShadow(QFrame::Raised);
+        label_4 = new QLabel(panelFrame);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setGeometry(QRect(10, 10, 101, 17));
+        QFont font4;
+        font4.setFamily(QString::fromUtf8("DejaVu Sans"));
+        font4.setBold(true);
+        font4.setWeight(75);
+        label_4->setFont(font4);
+        establishContactButton = new QPushButton(panelFrame);
         establishContactButton->setObjectName(QString::fromUtf8("establishContactButton"));
-        establishContactButton->setGeometry(QRect(20, 20, 131, 25));
-        tabWidget->addTab(headsetPanel, QString());
-        adminPanel = new QWidget();
-        adminPanel->setObjectName(QString::fromUtf8("adminPanel"));
-        tabWidget->addTab(adminPanel, QString());
+        establishContactButton->setGeometry(QRect(10, 40, 131, 25));
+        loseContactButton = new QPushButton(panelFrame);
+        loseContactButton->setObjectName(QString::fromUtf8("loseContactButton"));
+        loseContactButton->setGeometry(QRect(10, 70, 101, 25));
+        label_5 = new QLabel(panelFrame);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setGeometry(QRect(10, 130, 101, 17));
+        label_5->setFont(font4);
+        label_3 = new QLabel(panelFrame);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(200, 180, 41, 17));
+        label = new QLabel(panelFrame);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setGeometry(QRect(10, 160, 62, 17));
+        label_2 = new QLabel(panelFrame);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setGeometry(QRect(80, 180, 31, 17));
+        batterySlider = new QSlider(panelFrame);
+        batterySlider->setObjectName(QString::fromUtf8("batterySlider"));
+        batterySlider->setGeometry(QRect(80, 160, 160, 16));
+        batterySlider->setMaximum(100);
+        batterySlider->setOrientation(Qt::Horizontal);
+        batterySlider->setTickPosition(QSlider::TicksBelow);
+        batterySlider->setTickInterval(50);
+        onoffButton = new QToolButton(panelFrame);
+        onoffButton->setObjectName(QString::fromUtf8("onoffButton"));
+        onoffButton->setGeometry(QRect(10, 220, 161, 24));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 882, 22));
+        menubar->setGeometry(QRect(0, 0, 890, 22));
         menuNeureset = new QMenu(menubar);
         menuNeureset->setObjectName(QString::fromUtf8("menuNeureset"));
         MainWindow->setMenuBar(menubar);
@@ -180,9 +211,6 @@ public:
         menubar->addAction(menuNeureset->menuAction());
 
         retranslateUi(MainWindow);
-
-        tabWidget->setCurrentIndex(0);
-
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -196,16 +224,18 @@ public:
         pauseButton->setText(QCoreApplication::translate("MainWindow", "\342\226\220\342\226\220", nullptr));
         startButton->setText(QCoreApplication::translate("MainWindow", "\342\226\266", nullptr));
         stopButton->setText(QCoreApplication::translate("MainWindow", "\342\227\274", nullptr));
-        batteryIndicator->setText(QCoreApplication::translate("MainWindow", "\342\232\241", nullptr));
-        onoffButton->setText(QCoreApplication::translate("MainWindow", "I/O", nullptr));
         contactLight->setText(QString());
         treatmentLight->setText(QString());
         contactLostLight->setText(QString());
         okButton->setText(QCoreApplication::translate("MainWindow", "OK", nullptr));
-        loseContactButton->setText(QCoreApplication::translate("MainWindow", "Lose Contact", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "EEG HeadSet", nullptr));
         establishContactButton->setText(QCoreApplication::translate("MainWindow", "Establish Contact", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(headsetPanel), QCoreApplication::translate("MainWindow", "EEG Headset", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(adminPanel), QCoreApplication::translate("MainWindow", "Admin", nullptr));
+        loseContactButton->setText(QCoreApplication::translate("MainWindow", "Lose Contact", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "Admin", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "100%", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Battery", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "0%", nullptr));
+        onoffButton->setText(QCoreApplication::translate("MainWindow", "Power ON/Power OFF", nullptr));
         menuNeureset->setTitle(QCoreApplication::translate("MainWindow", "Neureset", nullptr));
     } // retranslateUi
 
