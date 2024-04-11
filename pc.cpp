@@ -20,7 +20,7 @@ void PC::save(const QDateTime &s, const QDateTime &e, const QMap<int, double> &b
     pcDB.saveSession(s, e, b, a);
 }
 
-QList<QString>* PC::getData(){
+QVector<Data*>* PC::getData(){
     return pcDB.getSessions();
 }
 
