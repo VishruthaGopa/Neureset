@@ -4,8 +4,8 @@ const QString DBManager::DATE_FORMAT = "yyyy-MM-dd hh:mm";
 
 DBManager::DBManager(){
     db = QSqlDatabase::addDatabase("QSQLITE");
-//    db.setDatabaseName("neureset.db");
-    db.setDatabaseName("test.db");
+    db.setDatabaseName("neureset.db");
+//    db.setDatabaseName("test.db");
 
     qInfo("Instantiating database...");
 
@@ -38,7 +38,8 @@ bool DBManager::initDb(){
 
     QSqlQuery q;
     // database contains time start, time end, average before baseline and average after baseline
-    q.exec("CREATE TABLE IF NOT EXISTS sessions ( start_time TEXT NOT NULL, end_time TEXT NOT NULL, before_baseline DOUBLE NOT NULL, after_baseline DOUBLE NOT NULL);");
+    q.exec("CREATE TABLE IF NOT EXISTS sessions ( start_time TEXT NOT NULL, end_time TEXT NOT NULL, before_baseline DOUBLE NOT NULL, after_baseline DOUBLE NOT NULL,"
+           "UNIQUE (start_time, end_time, before_baseline, after_baseline));");
 
     return db.commit();
 }
@@ -81,18 +82,25 @@ bool DBManager::saveSession(const QDateTime &start, const QDateTime &end, const 
 
 }
 
-QList<QString>* DBManager::getSessions(){
-    QList<QString>* retVal = new QList<QString>;
+//QVector<QString>* DBManager::getSessions() const{
+QVector<Data*>* DBManager::getSessions() const{
+//    QVector<QString>* retVal = new QVector<QString>;
+
+    QVector<Data*>* retVal = new QVector<Data*>;
 
     QSqlQuery q;
     q.exec("SELECT * FROM sessions");
 
     while(q.next()){
 
-        retVal->append( q.value(0).toString() );
-        retVal->append( q.value(1).toString() );
-        retVal->append( q.value(2).toString() );
-        retVal->append( q.value(3).toString() );
+        Data* inVal = new Data;
+
+        inVal->startTime = q.value(0).toString();
+        inVal->endTime = q.value(1).toString();
+        inVal->beforeFreq = q.value(2).toString();
+        inVal->afterFreq = q.value(3).toString();
+
+        retVal->append( inVal );
 
     }
 
@@ -103,4 +111,21 @@ bool DBManager::deleteData(){
     QSqlQuery q;
     q.prepare("DELETE FROM sessions");
     return q.exec();
+}
+
+void DBManager::close(){
+    db.close();
+}
+
+int DBManager::countSessions() const{
+    QSqlQuery q;
+    q.exec("SELECT COUNT(*) FROM sessions");
+
+    q.next();
+
+    int retVal = q.value(0).toInt();
+
+    qInfo("RETURNED ROWS: %2d", retVal);
+
+    return retVal;
 }

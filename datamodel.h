@@ -2,6 +2,7 @@
 #define DATAMODEL_H
 
 #include <QAbstractTableModel>
+#include "dbmanager.h"
 
 class DataModel: public QAbstractTableModel
 {
@@ -20,8 +21,9 @@ class DataModel: public QAbstractTableModel
         QVariant headerData( int header, Qt::Orientation orientation, int role ) const override;
 
     private:
-        int ROWS = 1;
+        int ROWS;
         const int COLUMNS = 4;
+        DBManager db;
 
 };
 
