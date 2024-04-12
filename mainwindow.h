@@ -32,6 +32,7 @@ private:
     void deviceOff();
     void deviceOn();
     void showDateTimeEdit();
+    QDateTime updatedDateTime;
 
 private slots:
     void navigateUpMenu();
@@ -48,6 +49,6 @@ private slots:
     void handleBatteryLevelChanged();
     void powerButtonClicked();
     void updateDateTime();
-
+    void updateDateTimeButtonClicked();
 };
 #endif // MAINWINDOW_H

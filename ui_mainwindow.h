@@ -47,6 +47,7 @@ public:
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QDateTimeEdit *dateTimeEdit;
+    QPushButton *updateDateTimeButton;
     QListWidget *listWidget;
     QProgressBar *progressBar;
     QPushButton *okButton;
@@ -123,7 +124,7 @@ public:
         contactLostLight->setStyleSheet(QString::fromUtf8("background-color: #ffcccf;"));
         verticalLayoutWidget = new QWidget(frame);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(110, 80, 291, 161));
+        verticalLayoutWidget->setGeometry(QRect(110, 80, 291, 165));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -132,6 +133,12 @@ public:
         dateTimeEdit->setEnabled(false);
 
         verticalLayout->addWidget(dateTimeEdit);
+
+        updateDateTimeButton = new QPushButton(verticalLayoutWidget);
+        updateDateTimeButton->setObjectName(QString::fromUtf8("updateDateTimeButton"));
+        updateDateTimeButton->setEnabled(true);
+
+        verticalLayout->addWidget(updateDateTimeButton);
 
         listWidget = new QListWidget(verticalLayoutWidget);
         listWidget->setObjectName(QString::fromUtf8("listWidget"));
@@ -240,6 +247,7 @@ public:
         contactLight->setText(QString());
         treatmentLight->setText(QString());
         contactLostLight->setText(QString());
+        updateDateTimeButton->setText(QCoreApplication::translate("MainWindow", "Update Date and Time", nullptr));
         okButton->setText(QCoreApplication::translate("MainWindow", "OK", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "EEG HeadSet", nullptr));
         establishContactButton->setText(QCoreApplication::translate("MainWindow", "Establish Contact", nullptr));

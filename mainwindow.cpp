@@ -15,6 +15,12 @@ MainWindow::MainWindow(QWidget *parent)
     showDateTimeEditActive = false;
     showTimer = false;
 
+    // Set date and time
+    updatedDateTime = QDateTime::currentDateTime();
+    ui->dateTimeEdit->setDateTime(updatedDateTime);
+    ui->updateDateTimeButton->hide();
+
+
     // Enable the establish contact button
     ui->establishContactButton->setEnabled(true);
     ui->loseContactButton->setEnabled(false);
@@ -50,10 +56,22 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect Power On/Off signal
     connect(ui->onoffButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
+    // Connect the clicked signal of the updateDateTimeButton to the slot
+    connect(ui->updateDateTimeButton, &QPushButton::clicked, this, &MainWindow::updateDateTimeButtonClicked);
+
+    // Set up the QTimer to update updatedDateTime every second
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [=]() {
+        updatedDateTime = updatedDateTime.addSecs(1);
+    });
+    timer->start(1000); //updatedDateTime var changes every 1 second
+
     // Set up the displayDateTime
     QTimer *displayDateTime = new QTimer(this);
     connect(displayDateTime, SIGNAL(timeout()), this, SLOT(updateDateTime()));
-    displayDateTime->start(1000); // Timer ticks every 1000 milliseconds (1 second)
+    displayDateTime->start(1000); // Display updates every 1 second
+
+
 }
 
 MainWindow::~MainWindow()
@@ -136,9 +154,10 @@ void MainWindow::showDateTimeEdit() {
 
     //Display date/time edit
     ui->dateTimeEdit->show();
+    ui->updateDateTimeButton->show(); //Button to update 
 
     // Set date and time
-    ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->dateTimeEdit->setDateTime(updatedDateTime);
     ui->dateTimeEdit->setEnabled(true);
 }
 
@@ -224,12 +243,23 @@ void MainWindow::timerLabel() {
 void MainWindow::updateDateTime() {
     if (powerOn && showDateTimeEditActive) {
         ui->listWidget->clear();
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        QString dateTimeString = currentDateTime.toString("MMM dd yyyy, hh:mm:ss");
+        //QDateTime currentDateTime = QDateTime::currentDateTime();
+        QString dateTimeString = updatedDateTime.toString("MMM dd yyyy, hh:mm:ss");
         //ui->labelDateTime->setText(dateTimeString);
         ui->listWidget->addItem(dateTimeString);
     }
 }
+
+void MainWindow::updateDateTimeButtonClicked() {
+    // Update updatedDateTime to reflect changes made by the user in the dateTimeEdit widget
+    updatedDateTime = ui->dateTimeEdit->dateTime();
+    QString dateTimeString = updatedDateTime.toString("MMM dd yyyy, hh:mm:ss");
+    
+    // Print the updated date and time
+    qInfo("Updated Date Time: %s", qPrintable(dateTimeString));
+
+}
+
 
 
 void MainWindow::toggleMenuVisibility() {
