@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->updateDateTimeButton, &QPushButton::clicked, this, &MainWindow::updateDateTimeButtonClicked);
 
     // Connect greenTreatmentSignal slot
-    //connect(electrodeInstance, &Electrode::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+    connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
 
     // Connect uploadPCButton signal
     connect(ui->uploadPCButton, &QPushButton::clicked, this, &MainWindow::uploadPCButtonClicked);
@@ -213,8 +213,9 @@ void MainWindow::onPauseButtonClicked() {
 }
 
 void MainWindow::onStopButtonClicked() {
-    // Stop and reset the session
-    qInfo("Session stopped");
+    // Stop the session
+    qInfo("Session ended");
+    neureset->endSession();
     //greenTreatmentSignal(); //just testing here
 }
 

@@ -97,6 +97,9 @@ void EEGHeadset::handleBaseline(double frequency) {
 void EEGHeadset::handleTreatmentApplied(double frequency) {
    if (!paused) {
        wait(1);
+        // Flashing green signal here
+        emit treatmentAppliedSignal();
+
        afterFrequencies.append(frequency);
        if (afterFrequencies.size() == 84) {
            double average = calculateDominantFrequency(afterFrequencies);
