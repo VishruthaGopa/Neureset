@@ -1,6 +1,5 @@
 3004Neureset Device Simulator
 Team Members: Caitlin Wardle, Daemon Gee, Vishrutha Gupa, Mion Keenan and Ada Huang
-
 NOTE: To display the waveform we have chosen to use QTCharts, which the professor comfirmed was allowed. This particular library often needs to be installed
 on ones local machine, using the terminal command: sudo apt install libqt5charts5-dev
 
