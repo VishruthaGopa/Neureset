@@ -58,6 +58,7 @@ signals:
     void newSession(Session *session);
     void treatmentCompleted(double feq);
     void measurementCompleted();
+    //void treatmentAppliedSignal(); //green light signal
 };
 
 

@@ -107,6 +107,7 @@ void EEGHeadset::handleBaseline(double frequency) {
            currElectrodeMeasurement = 1;
            measurementInProgress = false;
            qDebug() << "Average baseline frequency:" << average;
+           
            // Emit signal indicating measurement completion
            emit measurementCompleted();
        }

@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->updateDateTimeButton, &QPushButton::clicked, this, &MainWindow::updateDateTimeButtonClicked);
 
     // Connect greenTreatmentSignal slot
-    connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+    //connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
     connect(neureset, &NeuresetDevice::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
 
     // Connect uploadPCButton and showWaveformButton signal
@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, [=]() {
         updatedDateTime = updatedDateTime.addSecs(1);
         // Update the date/time in NeuresetDevice
-        neureset->setCurrentDateTime(updatedDateTime);
+        //neureset->setCurrentDateTime(updatedDateTime);
     });
     timer->start(1000); //updatedDateTime var changes every 1 second
 
@@ -235,7 +235,8 @@ void MainWindow::greenTreatmentSignal() {
         ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
     });
     
-    // Reduce battery levels by 20 every treatment
+    // Reduce battery levels by 10 every stage (40% every session depletion)
+    // depletion from 100 to 0 after 2 session -> (40*4)*3
     int currentBatteryLevel = ui->batterySlider->value();
     qInfo("Battery Level: %d", currentBatteryLevel);
     int newBatteryLevel = currentBatteryLevel - 10;
