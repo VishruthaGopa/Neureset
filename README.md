@@ -3,33 +3,19 @@
 Group Members: Caitlin Wardle, Ada Huang, Vishrutha Gopa, Damon Gee, Mion Keenan
 
 Division of Labour:
-    Caitlin: Neureset classes including
-                                        NeuresetDevice
-                                        EEGHeadset
-                                        Electrode
-                                        Session
-                                        SessionLog
-            Sequence Diagrams, Use Cases
+    Caitlin: Neureset classes including: NeuresetDevice, EEGHeadset, Electrode, Session, SessionLog. 
+    Sequence Diagrams, Use Cases
 
-    Ada: PC Database classes
-                                        DataModel
-                                        Database Manager (DBManager)
-                                        PC Window
-        Design Documentation
+    Ada: PC Database classes including: DataModel, Database Manager (DBManager), PC Window.
+    Design Documentation
 
-   Mion: Work within the PC Class
-                                        PC
-                                        TranseferWindow
-         Tracability Matrix
+   Mion: Work within the PC Class: PC,TranseferWindow.
+   Tracability Matrix
 
-  Visrutha: Main UI 
-                                        MainWindow
-                                        UI (MainWindow.ui)
-            ULM Class Diagram
+  Visrutha: Main UI: MainWindow,UI (MainWindow.ui).
+  ULM Class Diagram
 
- Damon: General Research
-           State Diagrams
-
+  Damon: General Research. State Diagrams
 
 Orginization of Project
     Code:
