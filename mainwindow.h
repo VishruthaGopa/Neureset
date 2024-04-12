@@ -5,6 +5,7 @@
 #include <QListWidget>
 #include <QDateTime>
 #include "neuresetdevice.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,9 +27,12 @@ private:
     EEGHeadset *eegheadset;
     NeuresetDevice* neureset;
     bool powerOn;
+    bool showDateTimeEditActive;
+    bool showTimer;
     void deviceOff();
     void deviceOn();
-    
+    void showDateTimeEdit();
+
 private slots:
     void navigateUpMenu();
     void navigateDownMenu();
@@ -43,5 +47,7 @@ private slots:
     void handleEEGHeadsetPanel();
     void handleBatteryLevelChanged();
     void powerButtonClicked();
+    void updateDateTime();
+
 };
 #endif // MAINWINDOW_H

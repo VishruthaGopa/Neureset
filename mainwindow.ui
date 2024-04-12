@@ -202,6 +202,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QDateTimeEdit" name="dateTimeEdit">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListWidget" name="listWidget">
         <property name="font">
          <font>
@@ -241,6 +248,16 @@
      </property>
      <property name="text">
       <string>OK</string>
+     </property>
+    </widget>
+    <widget class="QTimeEdit" name="timeEdit">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>310</y>
+       <width>118</width>
+       <height>26</height>
+      </rect>
      </property>
     </widget>
    </widget>

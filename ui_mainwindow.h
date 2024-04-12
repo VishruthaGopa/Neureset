@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
@@ -22,6 +23,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTimeEdit>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -44,9 +46,11 @@ public:
     QLabel *contactLostLight;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
+    QDateTimeEdit *dateTimeEdit;
     QListWidget *listWidget;
     QProgressBar *progressBar;
     QPushButton *okButton;
+    QTimeEdit *timeEdit;
     QFrame *line;
     QFrame *panelFrame;
     QLabel *label_4;
@@ -123,6 +127,12 @@ public:
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
+        dateTimeEdit = new QDateTimeEdit(verticalLayoutWidget);
+        dateTimeEdit->setObjectName(QString::fromUtf8("dateTimeEdit"));
+        dateTimeEdit->setEnabled(false);
+
+        verticalLayout->addWidget(dateTimeEdit);
+
         listWidget = new QListWidget(verticalLayoutWidget);
         listWidget->setObjectName(QString::fromUtf8("listWidget"));
         QFont font2;
@@ -149,6 +159,9 @@ public:
         font3.setBold(true);
         font3.setWeight(75);
         okButton->setFont(font3);
+        timeEdit = new QTimeEdit(frame);
+        timeEdit->setObjectName(QString::fromUtf8("timeEdit"));
+        timeEdit->setGeometry(QRect(180, 310, 118, 26));
         line = new QFrame(centralwidget);
         line->setObjectName(QString::fromUtf8("line"));
         line->setGeometry(QRect(610, 10, 16, 391));

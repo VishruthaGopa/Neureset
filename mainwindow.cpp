@@ -9,16 +9,15 @@ MainWindow::MainWindow(QWidget *parent)
     eegheadset=new EEGHeadset();
     neureset=new NeuresetDevice(eegheadset);
 
+    // Device off at start
     powerOn = false;
     deviceOff();
-
-    // Timer
-    //timerLabel();
+    showDateTimeEditActive = false;
+    showTimer = false;
 
     // Enable the establish contact button
     ui->establishContactButton->setEnabled(true);
     ui->loseContactButton->setEnabled(false);
-
 
     // Start with dull signal lights
     ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
@@ -51,6 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect Power On/Off signal
     connect(ui->onoffButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
+    // Set up the displayDateTime
+    QTimer *displayDateTime = new QTimer(this);
+    connect(displayDateTime, SIGNAL(timeout()), this, SLOT(updateDateTime()));
+    displayDateTime->start(1000); // Timer ticks every 1000 milliseconds (1 second)
 }
 
 MainWindow::~MainWindow()
@@ -111,17 +114,32 @@ void MainWindow::handleSelection() {
 
     // Act based on the text of the currently selected item
     if (selectedItemText == "NEW SESSION") {
-        // Logic for starting a new session
         qInfo("Starting NEW SESSION...");
         onStartButtonClicked();
+
     } else if (selectedItemText == "SESSION LOG") {
-        // Logic for showing session log
+        qInfo("Displaying SESSION LOG...");
         onSessionLogRequested();
-        qInfo("Opening SESSION LOG...");
+
     } else if (selectedItemText == "TIME AND DATE") {
-        // Logic for showing time and date info
-        qInfo("Showing TIME AND DATE...");
+        qInfo("Setting TIME AND DATE...");
+        showDateTimeEdit();
+
     }
+}
+
+void MainWindow::showDateTimeEdit() {
+    // Clear screen of menu choices
+    ui->listWidget->clear();
+
+    showDateTimeEditActive = true; 
+
+    //Display date/time edit
+    ui->dateTimeEdit->show();
+
+    // Set date and time
+    ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->dateTimeEdit->setEnabled(true);
 }
 
 void MainWindow::onSessionLogRequested(){
@@ -175,12 +193,10 @@ void MainWindow::handleEEGHeadsetPanel() {
     if (button == ui->establishContactButton) {
         // Logic for establishing contact with EEG headset
         qInfo("Establishing contact with EEG headset...");
-        //onStartButtonClicked();
 
         // Enable the lose contact button
         ui->loseContactButton->setEnabled(true);
         ui->establishContactButton->setEnabled(false);
-
 
     } else if (button == ui->loseContactButton) {
         // Logic for losing contact with EEG headset
@@ -196,20 +212,34 @@ void MainWindow::handleEEGHeadsetPanel() {
 }
 
 void MainWindow::timerLabel() {
+    showDateTimeEditActive = false;  
+    showTimer = true;
+
     ui->listWidget->clear();
-    // Show the current date and time in the QLabel
-    QDateTime currentDateTime = QDateTime::currentDateTime();
-    QString dateTimeString = currentDateTime.toString("MMM dd yyyy, hh:mm:ss");
-    ui->listWidget->addItem(dateTimeString);
+    QString timeRemaining = ("Time Remaining");
+    ui->listWidget->addItem(timeRemaining);
 }
 
+
+void MainWindow::updateDateTime() {
+    if (powerOn && showDateTimeEditActive) {
+        ui->listWidget->clear();
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+        QString dateTimeString = currentDateTime.toString("MMM dd yyyy, hh:mm:ss");
+        //ui->labelDateTime->setText(dateTimeString);
+        ui->listWidget->addItem(dateTimeString);
+    }
+}
 
 
 void MainWindow::toggleMenuVisibility() {
     // Clear the listWidget contents in any case
     ui->listWidget->clear();
+    ui->dateTimeEdit->hide();
 
     if (!showMenuOptions) {
+        showDateTimeEditActive = false;  
+
         // Define alternating colors
         QColor color1(235, 235, 235); // Light gray
         QColor color2(215, 215, 215); // Slightly darker gray
@@ -223,7 +253,7 @@ void MainWindow::toggleMenuVisibility() {
         }
 
     } else {
-        timerLabel();    
+        timerLabel();  
     }
 
     // Toggle the flag for the next call
@@ -249,26 +279,24 @@ void MainWindow::handleBatteryLevelChanged() {
 }
 
 void MainWindow::powerButtonClicked() {
-    // on/off device
-    qInfo("power button clicked");
     powerOn = !powerOn; //Toggle powerOn when clicked
-
-    // Disable the frame when off
     if (powerOn){
         deviceOn();
     }else{
         deviceOff();   
     }
-
 }
 
 void MainWindow::deviceOn(){
+    qInfo("Device ON");
     timerLabel();    
     ui->frame->setEnabled(true);
 }
 
 void MainWindow::deviceOff(){
+    qInfo("Device OFF");
     ui->listWidget->clear();
+    ui->dateTimeEdit->hide();
     QString item = "Neureset Device is Off.";
     ui->listWidget->addItem(item);
     ui->frame->setEnabled(false);
