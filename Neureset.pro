@@ -1,4 +1,5 @@
 QT       += core gui sql
+QT += charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,7 +20,8 @@ SOURCES += \
     neuresetdevice.cpp \
     eegheadset.cpp \
     electrode.cpp \
-    counter.cpp
+    counter.cpp \
+    transferwindow.cpp
 
 HEADERS += \
     datamodel.h \
@@ -31,10 +33,12 @@ HEADERS += \
     neuresetdevice.h \
     eegheadset.h \
     electrode.h \
-    counter.h
+    counter.h \
+    transferwindow.h
 
 FORMS += \
-    pcwindow.ui
+    pcwindow.ui \
+    transferwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
