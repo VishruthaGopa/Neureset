@@ -242,7 +242,7 @@
     <widget class="QPushButton" name="okButton">
      <property name="geometry">
       <rect>
-       <x>500</x>
+       <x>510</x>
        <y>140</y>
        <width>30</width>
        <height>30</height>
@@ -409,6 +409,9 @@
      <property name="maximum">
       <number>100</number>
      </property>
+     <property name="value">
+      <number>100</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -416,7 +419,7 @@
       <enum>QSlider::TicksBelow</enum>
      </property>
      <property name="tickInterval">
-      <number>50</number>
+      <number>20</number>
      </property>
     </widget>
     <widget class="QToolButton" name="onoffButton">
@@ -443,6 +446,19 @@
      </property>
      <property name="text">
       <string>Upload to PC</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="showWaveformButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>300</y>
+       <width>161</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show Waveform</string>
      </property>
     </widget>
    </widget>

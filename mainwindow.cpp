@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     deviceOff();
     showDateTimeEditActive = false;
     showTimer = false;
+    ui->batterySlider->setValue(100);
+
 
     // Set date and time
     updatedDateTime = QDateTime::currentDateTime();
@@ -61,9 +63,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Connect greenTreatmentSignal slot
     connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+    connect(neureset, &NeuresetDevice::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
 
-    // Connect uploadPCButton signal
+    // Connect uploadPCButton and showWaveformButton signal
     connect(ui->uploadPCButton, &QPushButton::clicked, this, &MainWindow::uploadPCButtonClicked);
+    connect(ui->showWaveformButton, &QPushButton::clicked, this, &MainWindow::showWaveformButtonClicked);
 
     // Set up the QTimer to update updatedDateTime every second
     QTimer *timer = new QTimer(this);
@@ -203,6 +207,12 @@ void MainWindow::greenTreatmentSignal() {
     QTimer::singleShot(1000, this, [=]() {
         ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
     });
+    
+    // Reduce battery levels by 20 every treatment
+    int currentBatteryLevel = ui->batterySlider->value();
+    qInfo("Battery Level: %d", currentBatteryLevel);
+    int newBatteryLevel = currentBatteryLevel - 20;
+    ui->batterySlider->setValue(newBatteryLevel);
 }
 
 
@@ -349,4 +359,8 @@ void MainWindow::deviceOff(){
 
 void MainWindow::uploadPCButtonClicked() {
     qInfo("Upload Data to PC");
+}
+
+void MainWindow::showWaveformButtonClicked() {
+    qInfo("Show Waveform");
 }

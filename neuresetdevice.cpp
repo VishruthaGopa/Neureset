@@ -71,6 +71,9 @@ void NeuresetDevice::measurementHandler(){
 }
 
 void NeuresetDevice::treatNextHandler(double frequency) {
+    // Flashing green signal here
+    emit treatmentAppliedSignal(); // check placement
+
     if (sessionInProgress) {
         qInfo("Finding Overall Baseline after %g",frequency);
         calculateOverallBaseline();

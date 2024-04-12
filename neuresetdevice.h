@@ -52,7 +52,8 @@ public:
     void treatNextHandler(double frequency);
 
 signals:
-     void sessionProgress(int percentage);
+    void sessionProgress(int percentage);
+    void treatmentAppliedSignal(); //green light signal  
 
 };
 

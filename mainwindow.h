@@ -51,5 +51,6 @@ private slots:
     void updateDateTimeButtonClicked();
     void greenTreatmentSignal();
     void uploadPCButtonClicked();
+    void showWaveformButtonClicked();
 };
 #endif // MAINWINDOW_H
