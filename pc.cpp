@@ -3,20 +3,36 @@
 
 PC::PC(QObject *parent): QObject{parent}{
     isConnected = false;
+    sessionLogsBuf = nullptr;
 }
 
-void PC::transferSessions() {
-    // get session history from Neureset device and save each session to db
+void PC::retrieveSessions(QList<Session*>* sessions) {
+    // store sessions in temporary buffer, retrieved from Neureset device or from provided argument
+    sessionLogsBuf = new QList<Session*>;
 
-    QList<Session*> sessionLogs;
-    sessionLogs = device->getSessionLog()->getSessionHistory();
-
-    for (int i = 0; i < sessionLogs.count(); i++) {
-        save(sessionLogs[i]->getStartTime(), sessionLogs[i]->getEndTime(), sessionLogs[i]->getBeforeBaseline(), sessionLogs[i]->getAfterBaseline());
+    if (sessions != nullptr) {
+        *sessionLogsBuf = *sessions;
+    }
+    else {
+        *sessionLogsBuf = device->getSessionLog()->getSessionHistory();
     }
 }
 
-void PC::save(const QDateTime &s, const QDateTime &e, const QMap<int, double> &b, const QMap<int, double> &a){
+void PC::cancelCommit() {
+    delete sessionLogsBuf;
+    sessionLogsBuf = nullptr;
+}
+
+void PC::commitToDb() {
+    // save each session to the database
+    for (int i = 0; i < (*sessionLogsBuf).count(); i++) {
+        save((*sessionLogsBuf)[i]->getStartTime(), (*sessionLogsBuf)[i]->getEndTime(), (*sessionLogsBuf)[i]->getBeforeBaseline(), (*sessionLogsBuf)[i]->getAfterBaseline());
+    }
+    delete sessionLogsBuf;
+    sessionLogsBuf = nullptr;
+}
+
+void PC::save(const QDateTime &s, const QDateTime &e, const double b, const double a){
     pcDB.saveSession(s, e, b, a);
 }
 
@@ -25,6 +41,8 @@ QVector<Data*>* PC::getData(){
 }
 
 bool PC::getConnect(){ return isConnected; }
+
+QList<Session*>* PC::getSessionLogsBuf() const { return sessionLogsBuf; }
 
 void PC::setConnect(bool value ){
     isConnected = value;

@@ -1,5 +1,6 @@
 #include "pcwindow.h"
 #include "ui_pcwindow.h"
+#include "transferwindow.h"
 #include <QtDebug>
 
 PCWindow::PCWindow(QWidget *parent)
@@ -14,10 +15,8 @@ PCWindow::PCWindow(QWidget *parent)
     // create table model view
     setUpTable();
 
-    // testing with adding values
-    connect(ui->exampleButton, SIGNAL(released()), this, SLOT(handleExample()) );
-
     connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(handleConnect()));
+    connect(ui->transferButton, SIGNAL(released()), this, SLOT(handleTransfer()));
 
 }
 
@@ -32,20 +31,53 @@ void PCWindow::setUpTable(){
 }
 
 void PCWindow::handleConnect(){
-    if( pc->getConnect() == false ){ pc->setConnect(true); }
-    else{ pc->setConnect( false ); }
+    if( pc->getConnect() == false ) {
+        pc->setConnect(true);
+        ui->transferButton->setEnabled(true);
+    }
+    else {
+        pc->setConnect(false);
+        ui->transferButton->setEnabled(false);
+    }
 }
 
-void PCWindow::handleExample(){
-    qInfo("Add new row!");
+void PCWindow::handleTransfer() {
 
-    // prepends to the front
-//    int a = model.rowCount(QModelIndex());
+    // this grabs from neureset device
+    // pc->retrieveSessions();
 
-    // appends to the back
-    int a = model.rowCount();
+    // test
+    Session* s = new Session();
+    Session* s2 = new Session();
+    s->startTimer();
+    s->endTimer();
+    s->setBeforeBaseline(69);
+    s->setAfterBaseline(420);
+    s2->startTimer();
+    s2->endTimer();
+    s2->setBeforeBaseline(727);
+    s2->setAfterBaseline(727);
+    QList<Session*> list;
+    list.append(s);
+    list.append(s2);
+    pc->retrieveSessions(&list);
+    // end hard code
 
-    model.insertRows(a, 1, QModelIndex());
+    TransferWindow* transferWindow = new TransferWindow(this);
+    transferWindow->displaySessions(pc->getSessionLogsBuf());
+    transferWindow->exec();
 
+    bool r = transferWindow->getResponse();
+    if (r) {
+        int a = model.rowCount();
+        model.insertRows(a, pc->getSessionLogsBuf()->count(), QModelIndex());
+        pc->commitToDb();
+        qInfo("Done");
+    }
+    else {
+        pc->cancelCommit();
+    }
+
+    delete transferWindow;
 }
 

@@ -25,8 +25,8 @@ class PCWindow : public QMainWindow
         DataModel model;
 
     private slots:
-        void handleExample();
         void handleConnect();
+        void handleTransfer();
 
 };
 #endif // PCWINDOW_H

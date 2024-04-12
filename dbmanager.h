@@ -25,7 +25,7 @@ class DBManager
         static const QString DATE_FORMAT;
 
         DBManager();
-        bool saveSession(const QDateTime& s, const QDateTime& e, const QMap<int,double>& b, const QMap<int,double>& a);
+        bool saveSession(const QDateTime& s, const QDateTime& e, const double b, const double a);
         QVector<Data*>* getSessions() const;
         bool deleteData();
         void close();

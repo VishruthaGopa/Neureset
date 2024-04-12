@@ -44,10 +44,7 @@ bool DBManager::initDb(){
     return db.commit();
 }
 
-bool DBManager::saveSession(const QDateTime &start, const QDateTime &end, const QMap<int, double> &before, const QMap<int, double> &after){
-
-    qInfo("Calling save sessions function...");
-
+bool DBManager::saveSession(const QDateTime &start, const QDateTime &end, const double before, const double after){
     db.transaction();
 
     QSqlQuery q;
@@ -57,24 +54,8 @@ bool DBManager::saveSession(const QDateTime &start, const QDateTime &end, const 
 
     q.bindValue( ":start" , start.toString(DATE_FORMAT));
     q.bindValue(":end", end.toString(DATE_FORMAT));
-
-    // find average before baseline
-    double avg = 0;
-    int count = 0;
-    foreach (double id, before){
-        count++;
-        avg += id;
-    }
-    q.bindValue(":before", (avg/count));
-
-    //find average after baseline
-    avg = 0;
-    count = 0;
-    foreach (double id, after){
-        count++;
-        avg += id;
-    }
-    q.bindValue(":after", (avg/count));
+    q.bindValue(":before", before);
+    q.bindValue(":after", after);
 
     q.exec();
 

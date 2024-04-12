@@ -12,15 +12,20 @@ class PC : public QObject
         explicit PC(QObject *parent = nullptr);
 
         // functions
-        void transferSessions();
-        void save(const QDateTime& start, const QDateTime& end, const QMap<int, double>& before, const QMap<int, double>& after);
+        void retrieveSessions(QList<Session*>* sessions);
+        void cancelCommit();
+        void commitToDb();
+        void save(const QDateTime& start, const QDateTime& end, const double before, const double after);
+
         QVector<Data*>* getData();
         void setConnect(bool);
         bool getConnect();
+        QList<Session*>* getSessionLogsBuf() const;
 
     private:
         bool isConnected;
         NeuresetDevice* device;
+        QList<Session*>* sessionLogsBuf;
         DBManager pcDB;
 
     signals:

@@ -27,19 +27,6 @@
      <string>NeureSet Connected</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="returnButton">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>520</y>
-      <width>81</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Return</string>
-    </property>
-   </widget>
    <widget class="QTableView" name="table">
     <property name="geometry">
      <rect>
@@ -50,17 +37,20 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="exampleButton">
+   <widget class="QPushButton" name="transferButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>670</x>
       <y>520</y>
-      <width>81</width>
+      <width>111</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Example</string>
+     <string>Transfer Data</string>
     </property>
    </widget>
   </widget>
