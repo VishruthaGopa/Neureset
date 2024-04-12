@@ -108,11 +108,9 @@ void EEGHeadset::handleTreatmentApplied(double frequency) {
            afterFrequencies.clear();
            baselineFrequencies.clear();
            currElectrodeTreatment= 1;
+        }
 
-            // Flashing green signal here
-            emit treatmentAppliedSignal();
-       }
-       else if(afterFrequencies.size()%21==0){
+        else if(afterFrequencies.size()%21==0){
            emit treatmentCompleted(treatmentInProgress);
            currElectrodeTreatment= 1;
        }

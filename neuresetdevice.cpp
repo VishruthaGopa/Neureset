@@ -17,6 +17,9 @@ NeuresetDevice::NeuresetDevice(EEGHeadset* headset, QObject* parent) : QObject(p
     percentage = 0;
     totalEvents = 29;
     currEvents = 0;
+    
+    // Set currentDateTime to the current date and time at the start
+    currentDateTime = QDateTime::currentDateTime();
 }
 
 void NeuresetDevice::calculateOverallBaseline() {
@@ -28,6 +31,12 @@ void NeuresetDevice::stopTreatment() {
 }
 
 void NeuresetDevice::gotNewSession(Session* session) {
+    // testing the current date and time
+    //emit getUpdatedDateTime;
+    qInfo("NeuresetDevice: Current Date Time: %s", qPrintable(currentDateTime.toString("MMM dd yyyy, hh:mm:ss")));
+    // QDateTime getDate = getCurrentDateTime();
+    // qInfo("NeuresetDevice: Current Date Time: %s", qPrintable(getDate.toString("MMM dd yyyy, hh:mm:ss")));
+
     session->endTimer();
     sessionLog->addSession(session);
 }
@@ -134,3 +143,7 @@ void NeuresetDevice::handlePercentage() {
     sessionProgress(percentage);
 }
 
+
+void NeuresetDevice::setCurrentDateTime(QDateTime dateTime){
+    currentDateTime = dateTime;
+}

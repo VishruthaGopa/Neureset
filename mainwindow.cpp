@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     batteryDied = false;
     showDateTimeEditActive = false;
     showTimer = false;
-    ui->batterySlider->setValue(80);
+    ui->batterySlider->setValue(100);
 
 
     // Set date and time
@@ -74,6 +74,8 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [=]() {
         updatedDateTime = updatedDateTime.addSecs(1);
+        // Update the date/time in NeuresetDevice
+        neureset->setCurrentDateTime(updatedDateTime);
     });
     timer->start(1000); //updatedDateTime var changes every 1 second
 
@@ -108,7 +110,7 @@ void MainWindow::checkBatteryLevel() {
         powerOn = true;
         deviceOn();
         onStartButtonClicked(); //Resume Session after battery dies and user increases battery?
-        
+
         //qInfo("Battery Level: %d", batteryLevel);
         batteryDied = false;
     }
@@ -236,7 +238,7 @@ void MainWindow::greenTreatmentSignal() {
     // Reduce battery levels by 20 every treatment
     int currentBatteryLevel = ui->batterySlider->value();
     qInfo("Battery Level: %d", currentBatteryLevel);
-    int newBatteryLevel = currentBatteryLevel - 20;
+    int newBatteryLevel = currentBatteryLevel - 10;
     ui->batterySlider->setValue(newBatteryLevel);
 
     // Check if the new battery level is <= 0, then turn off the device
@@ -300,7 +302,6 @@ void MainWindow::timerLabel() {
 void MainWindow::updateDateTime() {
     if (powerOn && showDateTimeEditActive) {
         ui->listWidget->clear();
-        //QDateTime currentDateTime = QDateTime::currentDateTime();
         QString dateTimeString = updatedDateTime.toString("MMM dd yyyy, hh:mm:ss");
         //ui->labelDateTime->setText(dateTimeString);
         ui->listWidget->addItem(dateTimeString);
@@ -358,6 +359,9 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
+
+    // lose 1/3 of a progress. 
+
 }
 
 // handle slider release and retrieve slider value

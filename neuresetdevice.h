@@ -34,8 +34,8 @@ private:
     int currEvents;
     void calculateOverallBaseline();
     void stopTreatment();
-
-
+    
+    QDateTime currentDateTime; // QDateTime for start and stop time in session
 
 public:
     NeuresetDevice(EEGHeadset* headset, QObject* parent = nullptr);
@@ -50,11 +50,12 @@ public:
     void onTreatmentCompleted(double frequency);
     void measurementHandler();
     void treatNextHandler(double frequency);
+    void setCurrentDateTime(QDateTime dateTime);
 
 signals:
     void sessionProgress(int percentage);
     void treatmentAppliedSignal(); //green light signal  
-
+    void getUpdatedDateTime();
 };
 
 
