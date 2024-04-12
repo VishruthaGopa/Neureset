@@ -26,6 +26,7 @@ private:
     EEGHeadset *eegheadset;
     NeuresetDevice* neureset;
     bool powerOn;
+    bool batteryDied;
     bool showDateTimeEditActive;
     bool showTimer;
     void deviceOff();
@@ -52,5 +53,7 @@ private slots:
     void greenTreatmentSignal();
     void uploadPCButtonClicked();
     void showWaveformButtonClicked();
+    void checkBatteryLevel();
+
 };
 #endif // MAINWINDOW_H

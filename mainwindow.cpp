@@ -12,9 +12,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Device off at start
     powerOn = false;
     deviceOff();
+    batteryDied = false;
     showDateTimeEditActive = false;
     showTimer = false;
-    ui->batterySlider->setValue(100);
+    ui->batterySlider->setValue(80);
 
 
     // Set date and time
@@ -81,12 +82,36 @@ MainWindow::MainWindow(QWidget *parent)
     connect(displayDateTime, SIGNAL(timeout()), this, SLOT(updateDateTime()));
     displayDateTime->start(1000); // Display updates every 1 second
 
-
+    // Set up the QTimer to check battery level periodically
+    QTimer *batteryCheckTimer = new QTimer(this);
+    connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
+    batteryCheckTimer->start(5000); // Check battery level every 5 seconds
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::checkBatteryLevel() {
+    int batteryLevel = ui->batterySlider->value();
+    if (batteryLevel <= 0) {
+        powerOn = false;
+        batteryDied = true;
+        qInfo("Battery Level: %d", batteryLevel);
+        onPauseButtonClicked(); // Pause Session if battery dies?
+
+        deviceOff();
+        QString item = "Check battery.";
+        ui->listWidget->addItem(item);
+    }else if(batteryDied && batteryLevel>=0) {
+        powerOn = true;
+        deviceOn();
+        onStartButtonClicked(); //Resume Session after battery dies and user increases battery?
+        
+        //qInfo("Battery Level: %d", batteryLevel);
+        batteryDied = false;
+    }
 }
 
 void MainWindow::navigateUpMenu() {
@@ -213,6 +238,14 @@ void MainWindow::greenTreatmentSignal() {
     qInfo("Battery Level: %d", currentBatteryLevel);
     int newBatteryLevel = currentBatteryLevel - 20;
     ui->batterySlider->setValue(newBatteryLevel);
+
+    // Check if the new battery level is <= 0, then turn off the device
+    /*if (newBatteryLevel <= 0) {
+        deviceOff();
+        QString item = "Check battery.";        
+        ui->listWidget->addItem(item);
+    }*/
+
 }
 
 
