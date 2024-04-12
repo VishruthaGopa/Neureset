@@ -263,9 +263,10 @@ void MainWindow::updateDateTimeButtonClicked() {
 
 
 void MainWindow::toggleMenuVisibility() {
-    // Clear the listWidget contents in any case
+    // Clear the listWidget contents
     ui->listWidget->clear();
     ui->dateTimeEdit->hide();
+    ui->updateDateTimeButton->hide();
 
     if (!showMenuOptions) {
         showDateTimeEditActive = false;  

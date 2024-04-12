@@ -23,7 +23,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTimeEdit>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -51,7 +50,6 @@ public:
     QListWidget *listWidget;
     QProgressBar *progressBar;
     QPushButton *okButton;
-    QTimeEdit *timeEdit;
     QFrame *line;
     QFrame *panelFrame;
     QLabel *label_4;
@@ -166,9 +164,6 @@ public:
         font3.setBold(true);
         font3.setWeight(75);
         okButton->setFont(font3);
-        timeEdit = new QTimeEdit(frame);
-        timeEdit->setObjectName(QString::fromUtf8("timeEdit"));
-        timeEdit->setGeometry(QRect(180, 310, 118, 26));
         line = new QFrame(centralwidget);
         line->setObjectName(QString::fromUtf8("line"));
         line->setGeometry(QRect(610, 10, 16, 391));

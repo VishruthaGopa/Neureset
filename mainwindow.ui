@@ -260,16 +260,6 @@
       <string>OK</string>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="timeEdit">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>310</y>
-       <width>118</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
    </widget>
    <widget class="Line" name="line">
     <property name="geometry">
