@@ -23,7 +23,6 @@ private:
     Ui::MainWindow *ui;
     void timerLabel();
     bool showMenuOptions = false; 
-    void greenTreatmentSignal();
     EEGHeadset *eegheadset;
     NeuresetDevice* neureset;
     bool powerOn;
@@ -50,5 +49,7 @@ private slots:
     void powerButtonClicked();
     void updateDateTime();
     void updateDateTimeButtonClicked();
+    void greenTreatmentSignal();
+    void uploadPCButtonClicked();
 };
 #endif // MAINWINDOW_H

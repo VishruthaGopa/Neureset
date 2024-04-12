@@ -432,6 +432,19 @@
       <string>Power ON/Power OFF</string>
      </property>
     </widget>
+    <widget class="QToolButton" name="uploadPCButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>260</y>
+       <width>161</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Upload to PC</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

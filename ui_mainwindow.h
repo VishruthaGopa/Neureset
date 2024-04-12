@@ -61,6 +61,7 @@ public:
     QLabel *label_2;
     QSlider *batterySlider;
     QToolButton *onoffButton;
+    QToolButton *uploadPCButton;
     QMenuBar *menubar;
     QMenu *menuNeureset;
     QStatusBar *statusbar;
@@ -212,6 +213,9 @@ public:
         onoffButton = new QToolButton(panelFrame);
         onoffButton->setObjectName(QString::fromUtf8("onoffButton"));
         onoffButton->setGeometry(QRect(10, 220, 161, 24));
+        uploadPCButton = new QToolButton(panelFrame);
+        uploadPCButton->setObjectName(QString::fromUtf8("uploadPCButton"));
+        uploadPCButton->setGeometry(QRect(10, 260, 161, 24));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -252,6 +256,7 @@ public:
         label->setText(QCoreApplication::translate("MainWindow", "Battery", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "0%", nullptr));
         onoffButton->setText(QCoreApplication::translate("MainWindow", "Power ON/Power OFF", nullptr));
+        uploadPCButton->setText(QCoreApplication::translate("MainWindow", "Upload to PC", nullptr));
         menuNeureset->setTitle(QCoreApplication::translate("MainWindow", "Neureset", nullptr));
     } // retranslateUi
 

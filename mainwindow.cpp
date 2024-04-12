@@ -59,6 +59,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect the clicked signal of the updateDateTimeButton to the slot
     connect(ui->updateDateTimeButton, &QPushButton::clicked, this, &MainWindow::updateDateTimeButtonClicked);
 
+    // Connect greenTreatmentSignal slot
+    //connect(electrodeInstance, &Electrode::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+
+    // Connect uploadPCButton signal
+    connect(ui->uploadPCButton, &QPushButton::clicked, this, &MainWindow::uploadPCButtonClicked);
+
     // Set up the QTimer to update updatedDateTime every second
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [=]() {
@@ -162,7 +168,8 @@ void MainWindow::showDateTimeEdit() {
 }
 
 void MainWindow::onSessionLogRequested(){
-     showMenuOptions = !showMenuOptions;
+    showMenuOptions = !showMenuOptions;
+    
     //clear screen of menu choices
     ui->listWidget->clear();
     QString sessionDataString;
@@ -186,11 +193,16 @@ void MainWindow::onStartButtonClicked() {
     ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
     ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
     neureset->startSession();
-    //greenTreatmentSignal(); //just testing here
 }
 
 void MainWindow::greenTreatmentSignal() {
+    // Set the treatment light to bright green
     ui->treatmentLight->setStyleSheet("background-color: #60B115;"); // brighter green
+    
+    // QTimer to toggle back to dull green after one second
+    QTimer::singleShot(1000, this, [=]() {
+        ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
+    });
 }
 
 
@@ -201,8 +213,9 @@ void MainWindow::onPauseButtonClicked() {
 }
 
 void MainWindow::onStopButtonClicked() {
-    // Stop and possibly reset the session
+    // Stop and reset the session
     qInfo("Session stopped");
+    //greenTreatmentSignal(); //just testing here
 }
 
 
@@ -331,4 +344,8 @@ void MainWindow::deviceOff(){
     QString item = "Neureset Device is Off.";
     ui->listWidget->addItem(item);
     ui->frame->setEnabled(false);
+}
+
+void MainWindow::uploadPCButtonClicked() {
+    qInfo("Upload Data to PC");
 }
