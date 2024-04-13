@@ -11,11 +11,12 @@ sudo apt install libqt5charts5-dev
 ## Division of Labor:
 
 ### Caitlin:
-  - Neureset classes including: `NeuresetDevice`, `EEGHeadset`, `Electrode`, `Session`, `SessionLog`.
+  - Neureset classes: `NeuresetDevice`, `EEGHeadset`, `Electrode`, `Session`, `SessionLog`.
   - Sequence Diagrams.
   - Use Cases.
 
-### Ada:  - PC Database classes including: `DataModel`, `DBManager`, `PC Window`.
+### Ada:  
+  - PC Database classes: `DataModel`, `DBManager`, `PC Window`.
   - Design Decisions.
 
 ### Mion:
