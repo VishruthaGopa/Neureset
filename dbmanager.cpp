@@ -1,6 +1,6 @@
 #include "dbmanager.h"
 
-const QString DBManager::DATE_FORMAT = "yyyy-MM-dd hh:mm";
+const QString DBManager::DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 DBManager::DBManager(){
     db = QSqlDatabase::addDatabase("QSQLITE");
@@ -54,8 +54,8 @@ bool DBManager::saveSession(const QDateTime &start, const QDateTime &end, const 
 
     q.bindValue( ":start" , start.toString(DATE_FORMAT));
     q.bindValue(":end", end.toString(DATE_FORMAT));
-    q.bindValue(":before", before);
-    q.bindValue(":after", after);
+    q.bindValue(":before", QString::number(before, 'f', 3) );
+    q.bindValue(":after", QString::number(after, 'f', 3) );
 
     q.exec();
 
