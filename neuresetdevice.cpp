@@ -5,9 +5,6 @@ NeuresetDevice::NeuresetDevice(EEGHeadset* headset, QObject* parent) : QObject(p
     pauseTimer = new QTimer(this);
     QObject::connect(pauseTimer, &QTimer::timeout, this, &NeuresetDevice::cancelSession);
 
-    percentageTimer = new QTimer(this);
-    QObject::connect(percentageTimer, &QTimer::timeout, this, &NeuresetDevice::handlePercentage);
-
     sessionLog = new SessionLog();
     eegHeadset = headset;
     QObject::connect(eegHeadset, &EEGHeadset::measurementCompleted, this, &NeuresetDevice::measurementHandler);
@@ -17,9 +14,6 @@ NeuresetDevice::NeuresetDevice(EEGHeadset* headset, QObject* parent) : QObject(p
     percentage = 0;
     totalEvents = 29;
     currEvents = 0;
-    
-    // Set currentDateTime to the current date and time at the start
-    currentDateTime = QDateTime::currentDateTime();
 }
 
 void NeuresetDevice::calculateOverallBaseline() {
@@ -27,33 +21,32 @@ void NeuresetDevice::calculateOverallBaseline() {
 }
 
 void NeuresetDevice::stopTreatment() {
-    percentageTimer->stop();
+
 }
 
 void NeuresetDevice::gotNewSession(Session* session) {
-    // testing the current date and time
-    //emit getUpdatedDateTime;
-    qInfo("NeuresetDevice: Current Date Time: %s", qPrintable(currentDateTime.toString("MMM dd yyyy, hh:mm:ss")));
-    // QDateTime getDate = getCurrentDateTime();
-    // qInfo("NeuresetDevice: Current Date Time: %s", qPrintable(getDate.toString("MMM dd yyyy, hh:mm:ss")));
-
     session->endTimer();
     sessionLog->addSession(session);
 }
 
 void NeuresetDevice::startSession() {
+    emit sessionProgress(percentage);
     if (!sessionInProgress) {
         sessionInProgress = true;
+        eegHeadset->startSession();
         qInfo("Finding Initial Overall Baseline");
         calculateOverallBaseline();
         stage++;
-        percentageTimer->start(1000);
+
     } else {
         resumeSession();
     }
 }
 
 void NeuresetDevice::measurementHandler(){
+    currEvents+=5;
+    percentage = (currEvents * 100) / totalEvents;
+    emit sessionProgress(percentage);
     if (sessionInProgress) {
         if (stage == 1) {
             eegHeadset->startTreatment(5.0);
@@ -71,8 +64,7 @@ void NeuresetDevice::measurementHandler(){
             eegHeadset->startTreatment(20.0);
             stage++;
         }
-        else {
-            // All treatments completed, end the session
+        else{
             endSession();
             return;
         }
@@ -80,9 +72,11 @@ void NeuresetDevice::measurementHandler(){
 }
 
 void NeuresetDevice::treatNextHandler(double frequency) {
+    currEvents+=1;
+    percentage = (currEvents * 100) / totalEvents;
+    emit sessionProgress(percentage);
     // Flashing green signal here
     emit treatmentAppliedSignal(); // check placement
-
     if (sessionInProgress) {
         qInfo("Finding Overall Baseline after %g",frequency);
         calculateOverallBaseline();
@@ -95,9 +89,9 @@ void NeuresetDevice::endSession() {
         sessionInProgress = false;
         stage = 0;
         percentage = 0;
-        sessionProgress(percentage);
         currEvents = 0;
         stopTreatment();
+
     }
     else {
         qInfo("No Session in Progress");
@@ -130,7 +124,7 @@ void NeuresetDevice::cancelSession() {
         pauseTimer->stop();
         sessionInProgress = false;
         percentage = 0;
-        sessionProgress(percentage);
+        emit sessionProgress(percentage);
     }
     else {
         qInfo("No Session in Progress");
@@ -140,10 +134,6 @@ void NeuresetDevice::cancelSession() {
 void NeuresetDevice::handlePercentage() {
     currEvents++;
     percentage = (currEvents * 100) / totalEvents;
-    sessionProgress(percentage);
+    emit sessionProgress(percentage);
 }
 
-
-void NeuresetDevice::setCurrentDateTime(QDateTime dateTime){
-    currentDateTime = dateTime;
-}

@@ -19,7 +19,8 @@ EEGHeadset::EEGHeadset(QObject* parent) : QObject(parent) {
    currElectrodeTreatment = 1;
    currElectrodeMeasurement = 1;
    measurementInProgress=false;
-   treatmentInProgress=-1;
+   treatmentInProgress=false;
+   currStage=0;
    calculationTimer = new QTimer();
    QObject::connect(calculationTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 }
@@ -40,7 +41,8 @@ Electrode* EEGHeadset::getElectrodeSite(int index) const {
 }
 
 void EEGHeadset::startTreatment(double frequency) {
-   treatmentInProgress = frequency;
+   currStage = frequency;
+   treatmentInProgress=true;
    if (!paused) {
        QFutureSynchronizer<void> synchronizer;
        for (int i = currElectrodeTreatment - 1; i < electrodeSites.size(); ++i) {
@@ -50,7 +52,6 @@ void EEGHeadset::startTreatment(double frequency) {
            }));
        }
        synchronizer.waitForFinished();
-       treatmentInProgress = -1;
        currElectrodeTreatment=1;
    }
 }
@@ -58,7 +59,6 @@ void EEGHeadset::startTreatment(double frequency) {
 void EEGHeadset::startMeasurement() {
    measurementInProgress = true;
    wait(5);
-   session->startTimer();
    if (!paused) {
        QFutureSynchronizer<void> synchronizer;
        for (int i = currElectrodeMeasurement - 1; i < electrodeSites.size(); ++i) {
@@ -72,47 +72,65 @@ void EEGHeadset::startMeasurement() {
 
 void EEGHeadset::wait(int sec) {
    QEventLoop loop;
-   QTimer::singleShot(1000+sec, &loop, &QEventLoop::quit); // Wait for seconds
+   QTimer::singleShot(1000*sec, &loop, &QEventLoop::quit); // Wait for seconds
    loop.exec();
 }
 
 void EEGHeadset::handleBaseline(double frequency) {
    if (!paused) {
        baselineFrequencies.append(frequency);
-       if (baselineFrequencies.size() == 21) {
+       if(baselineFrequencies.size() == 105){
+           // All baselines measured, calculate dominant
+           double average = calculateDominantFrequency(baselineFrequencies);
+           session->setAfterBaseline(average);
+           qDebug() << "Average after frequency:" << average;
+           //send out session details
+           emit newSession(session);
+           createNewSession();
+           //cleanup data from electrodes
+           afterFrequencies.clear();
+           baselineFrequencies.clear();
+           currElectrodeTreatment= 1;
+           currElectrodeMeasurement = 1;
+           measurementInProgress = false;
+           currStage=0;
+           //reset electrodes
+           for(Electrode * electrode: electrodeSites){
+               electrode->setBaselineFrequency(0);
+           }
+           emit measurementCompleted();
+       }
+       else if (baselineFrequencies.size()==21){
            // All baselines measured, calculate dominant
            double average = calculateDominantFrequency(baselineFrequencies);
            session->setBeforeBaseline(average);
            currElectrodeMeasurement = 1;
            measurementInProgress = false;
            qDebug() << "Average baseline frequency:" << average;
-           baselineFrequencies.clear();
+           
            // Emit signal indicating measurement completion
            emit measurementCompleted();
-
+       }
+       else if (baselineFrequencies.size() % 21==0) {
+           // All baselines measured, calculate dominant
+           double average = calculateDominantFrequency(baselineFrequencies);
+           currElectrodeMeasurement = 1;
+           measurementInProgress = false;
+           qDebug() << "Average baseline frequency:" << average;
+           // Emit signal indicating measurement completion
+           emit measurementCompleted();
        }
    }
 }
 
 void EEGHeadset::handleTreatmentApplied(double frequency) {
    if (!paused) {
-       wait(1);
        afterFrequencies.append(frequency);
-       if (afterFrequencies.size() == 84) {
-           double average = calculateDominantFrequency(afterFrequencies);
-           session->setAfterBaseline(average);
-
-           qDebug() << "Average after frequency:" << average;
-           emit newSession(session);
-           createNewSession();
-           afterFrequencies.clear();
-           baselineFrequencies.clear();
+       if(afterFrequencies.size()%21==0){
+           wait(1);
+           emit treatmentCompleted(currStage);
            currElectrodeTreatment= 1;
-        }
-
-        else if(afterFrequencies.size()%21==0){
-           emit treatmentCompleted(treatmentInProgress);
-           currElectrodeTreatment= 1;
+           treatmentInProgress=false;
        }
    }
 }
@@ -122,36 +140,47 @@ void EEGHeadset::createNewSession() {
 }
 
 double EEGHeadset::calculateDominantFrequency(const QVector<double> &frequencies) {
-   int N = frequencies.size();
-   QVector<std::complex<double>> X(N);
+    int N = frequencies.size();
+    int windowSize = 21; // Consider the last 21 values
 
-   // Compute DFT
-   for (int k = 0; k < N; ++k) {
-       std::complex<double> sum = 0;
-       for (int n = 0; n < N; ++n) {
-           sum += frequencies[n] * std::exp(std::complex<double>(0, -2 * M_PI * k * n / N));
-       }
-       X[k] = sum;
-   }
+    // Check if the size of frequencies is less than the desired window size
+    if (N < windowSize) {
+        // Handle the case when there are fewer than 21 values
+        return 0.0; // or some appropriate default value
+    }
 
-   // Compute magnitude spectrum
-   QVector<double> magnitudes(N);
-   for (int k = 0; k < N; ++k) {
-       magnitudes[k] = std::abs(X[k]);
-   }
+    QVector<std::complex<double>> X(windowSize);
 
-   // Find index of max magnitude
-   double maxMagnitude = magnitudes[0];
-   int maxIndex = 0;
-   for (int k = 1; k < N; ++k) {
-       if (magnitudes[k] > maxMagnitude) {
-           maxMagnitude = magnitudes[k];
-           maxIndex = k;
-       }
-   }
+    // Compute DFT using only the last 21 values
+    for (int k = 0; k < windowSize; ++k) {
+        std::complex<double> sum = 0;
+        for (int n = N - windowSize; n < N; ++n) { // Consider the last 21 values
+            sum += frequencies[n] * std::exp(std::complex<double>(0, -2 * M_PI * k * n / N));
+        }
+        X[k] = sum;
+    }
 
-   return frequencies[maxIndex];
+    // Compute magnitude spectrum
+    QVector<double> magnitudes(windowSize);
+    for (int k = 0; k < windowSize; ++k) {
+        magnitudes[k] = std::abs(X[k]);
+    }
+
+    // Find index of max magnitude
+    double maxMagnitude = magnitudes[0];
+    int maxIndex = 0;
+    for (int k = 1; k < windowSize; ++k) {
+        if (magnitudes[k] > maxMagnitude) {
+            maxMagnitude = magnitudes[k];
+            maxIndex = k;
+        }
+    }
+
+    // Return the corresponding frequency from the original list
+    return frequencies[N - windowSize + maxIndex];
 }
+
+
 
 void EEGHeadset::cancelSession() {
    delete session;
@@ -160,6 +189,9 @@ void EEGHeadset::cancelSession() {
    baselineFrequencies.clear();
    currElectrodeMeasurement = 1;
    currElectrodeTreatment=1;
+   treatmentInProgress=false;
+   measurementInProgress=false;
+   currStage = 0;
    qInfo("Connection Lost Session Canceled.");
    paused = false;
 }
@@ -173,8 +205,11 @@ void EEGHeadset::resumeSession() {
    if (measurementInProgress==true){
        startMeasurement();
    }
-   if (treatmentInProgress!=-1){
-       startTreatment(treatmentInProgress);
+   if (treatmentInProgress==true){
+       startTreatment(currStage);
    }
 }
 
+void EEGHeadset::startSession(){
+    session->startTimer();
+}

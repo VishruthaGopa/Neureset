@@ -1,6 +1,6 @@
 #include "electrode.h"
 
-Electrode::Electrode(int id, QObject* parent) : QObject(parent), id(id), offsetFrequency(5.0), treatmentDuration(1.0), timeElapsed(0.0),samplingFrequency(1000),duration(1.0) {
+Electrode::Electrode(int id, QObject* parent) : QObject(parent), id(id), offsetFrequency(5.0), treatmentDuration(1.0), timeElapsed(0.0),samplingFrequency(1000),duration(1.0),baselineFrequency(0) {
     // Seed the random number generator with the current time
     srand(static_cast<unsigned>(time(nullptr)));
 }
@@ -19,7 +19,12 @@ double Electrode::getTreatmentDuration() const { return treatmentDuration; }
 // Calculate baseline frequency
 double Electrode::calculateBaseline() {
     qInfo("Generating WaveForm for Electrode, %d",id);
-    generateBrainWaveFrequency();
+    if(baselineFrequency==0){
+        generateBrainWaveFrequency();
+    }
+    else{
+        generateFromBaseline();
+    }
     baselineFrequency=calculateDominantFrequency();
     emit baselineMeasured(baselineFrequency);
     return  baselineFrequency;
@@ -36,6 +41,7 @@ void Electrode::applyTreatment() {
     baselineFrequency+=offsetFrequency;
     qInfo("Treatment applied for electrode %d at %d", id,static_cast<int>(offsetFrequency));
     emit treatmentApplied(baselineFrequency);
+    baselineFrequency-=offsetFrequency;
 }
 
 
@@ -240,6 +246,46 @@ void Electrode::plotWaveform() {
     chartView->show();
 }
 
+
+void Electrode::generateFromBaseline() {
+    // Validate the dominant frequency parameter
+    if (baselineFrequency <= 0.0) {
+        qWarning("Invalid dominant frequency provided.");
+        return;
+    }
+    // Determine the type of brainwave based on the dominant frequency
+    QString waveType;
+    if (baselineFrequency >= 8.0 && baselineFrequency <= 13.0) {
+        waveType = "Alpha";
+    } else if (baselineFrequency >= 14.0 && baselineFrequency <= 30.0) {
+        waveType = "Beta";
+    } else if (baselineFrequency >= 0.5 && baselineFrequency <= 4.0) {
+        waveType = "Delta";
+    } else if (baselineFrequency >= 4.0 && baselineFrequency <= 8.0) {
+        waveType = "Theta";
+    } else if (baselineFrequency > 30.0) {
+        waveType = "Gamma";
+    } else {
+        qWarning("Dominant frequency does not fall into known brainwave types.");
+        return;
+    }
+
+    // Generate waveform based on the determined type of brainwave
+    if (waveType == "Alpha") {
+        generateAlphaWave();
+    } else if (waveType == "Beta") {
+        generateBetaWave();
+    } else if (waveType == "Delta") {
+        generateDeltaWave();
+    } else if (waveType == "Theta") {
+        generateThetaWave();
+    } else if (waveType == "Gamma") {
+        generateGammaWave();
+    }
+
+    // Optionally, update the plot
+    // plotWaveform();
+}
 
 
 

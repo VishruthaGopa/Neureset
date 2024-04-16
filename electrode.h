@@ -65,7 +65,7 @@ public:
     void generateBrainWaveFrequency();
     double calculateDominantFrequency();
     void plotWaveform() ;
-
+    void generateFromBaseline();
 signals:
     void treatmentApplied(double fre);
     void baselineMeasured(double fre);
@@ -73,6 +73,3 @@ signals:
 };
 
 #endif // ELECTRODE_H
-
-
-

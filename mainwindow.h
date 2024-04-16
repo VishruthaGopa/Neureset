@@ -33,6 +33,10 @@ private:
     void deviceOn();
     void showDateTimeEdit();
     QDateTime updatedDateTime;
+    QTimer *sessionTimer;
+    int totalDuration = 29000;
+    int remainingTime; 
+
 
 private slots:
     void navigateUpMenu();
@@ -54,6 +58,7 @@ private slots:
     void uploadPCButtonClicked();
     void showWaveformButtonClicked();
     void checkBatteryLevel();
+    void updateTimerLabel();
 
 };
 #endif // MAINWINDOW_H

@@ -12,7 +12,6 @@
 #include "electrode.h"
 
 
-
 class EEGHeadset : public QObject {
     Q_OBJECT
 private:
@@ -23,7 +22,8 @@ private:
     int currElectrodeTreatment ;
     int currElectrodeMeasurement;
     bool measurementInProgress;
-    int treatmentInProgress;
+    bool treatmentInProgress;
+    int currStage;
     QTimer* calculationTimer;
     QEventLoop loop;
     bool paused;
@@ -47,6 +47,7 @@ public:
     void pauseSession();
     void startTreatment(double frequency);
     void resumeSession();
+    void startSession();
 
     // Function to calculate FFT and return dominant frequency
     double calculateDominantFrequency(const QVector<double> &frequencies);
@@ -57,7 +58,7 @@ signals:
     void newSession(Session *session);
     void treatmentCompleted(double feq);
     void measurementCompleted();
-    void treatmentAppliedSignal(); //green light signal  
+    //void treatmentAppliedSignal(); //green light signal
 };
 
 

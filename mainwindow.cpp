@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->updateDateTimeButton, &QPushButton::clicked, this, &MainWindow::updateDateTimeButtonClicked);
 
     // Connect greenTreatmentSignal slot
-    connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+    //connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
     connect(neureset, &NeuresetDevice::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
 
     // Connect uploadPCButton and showWaveformButton signal
@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, [=]() {
         updatedDateTime = updatedDateTime.addSecs(1);
         // Update the date/time in NeuresetDevice
-        neureset->setCurrentDateTime(updatedDateTime);
+        //neureset->setCurrentDateTime(updatedDateTime);
     });
     timer->start(1000); //updatedDateTime var changes every 1 second
 
@@ -87,7 +87,16 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up the QTimer to check battery level periodically
     QTimer *batteryCheckTimer = new QTimer(this);
     connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
-    batteryCheckTimer->start(5000); // Check battery level every 5 seconds
+    batteryCheckTimer->start(1000); // Check battery level every 5 seconds
+
+    // Initialize sessionTimer
+    sessionTimer = new QTimer(this);
+
+    // Set up the countdownTimer
+    QTimer *countdownTimer = new QTimer(this);
+    connect(countdownTimer, SIGNAL(timeout()), this, SLOT(updateTimerLabel()));
+    countdownTimer->start(1000); // Display updates every 1 second
+
 }
 
 MainWindow::~MainWindow()
@@ -109,11 +118,23 @@ void MainWindow::checkBatteryLevel() {
     }else if(batteryDied && batteryLevel>=0) {
         powerOn = true;
         deviceOn();
-        onStartButtonClicked(); //Resume Session after battery dies and user increases battery?
-
         //qInfo("Battery Level: %d", batteryLevel);
         batteryDied = false;
     }
+
+    QString sliderStyle = "groove:horizontal { border: 5px solid #5c5c5c; border-radius: 10px; height: 1px; margin: 2px 0; }"; // change the horizontal groove with rounded corners
+    sliderStyle += "QSlider::sub-page:horizontal { background: green; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the left side of the handle with border and rounded corners
+    sliderStyle += "QSlider::add-page:horizontal { background: #ECECEC; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the right side of the handle with border and rounded corners
+    sliderStyle += "QSlider::handle:horizontal { background: white; border: 0.5px solid #5c5c5c; width: 6px; height: 6px; margin: -3px 0; border-radius: 3px; }";
+
+
+    // Change green to red if battery level is less than or equal to 15
+    if (batteryLevel <= 15) {
+        sliderStyle.replace("background: green", "background: red");
+    }
+
+    ui->batterySlider->setStyleSheet(sliderStyle);
+
 }
 
 void MainWindow::navigateUpMenu() {
@@ -218,13 +239,6 @@ void MainWindow::onSessionLogRequested(){
     //display session data
     ui->listWidget->addItem(sessionDataString);
 }
-void MainWindow::onStartButtonClicked() {
-    // Starting a new session or resuming
-    qInfo("Session started/resume");
-    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
-    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-    neureset->startSession();
-}
 
 void MainWindow::greenTreatmentSignal() {
     // Set the treatment light to bright green
@@ -235,7 +249,8 @@ void MainWindow::greenTreatmentSignal() {
         ui->treatmentLight->setStyleSheet("background-color: #ddf3c8;"); // dull green
     });
     
-    // Reduce battery levels by 20 every treatment
+    // Reduce battery levels by 10 every stage (40% every session depletion)
+    // depletion from 100 to 0 after 2 session -> (40*4)*3
     int currentBatteryLevel = ui->batterySlider->value();
     qInfo("Battery Level: %d", currentBatteryLevel);
     int newBatteryLevel = currentBatteryLevel - 10;
@@ -250,18 +265,56 @@ void MainWindow::greenTreatmentSignal() {
 
 }
 
+void MainWindow::onStartButtonClicked() {
+    // Starting a new session or resuming
+
+    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+    
+    // Check if session if no session is in progress
+    if (!neureset->isSessionInProgress()) {
+        qInfo("Session started");
+
+        // Start session timer for 29 seconds
+        sessionTimer->start(totalDuration);
+        
+    }else if(neureset->isSessionPaused()){
+        qInfo("Session resumed");
+        sessionTimer->start(remainingTime); // Resume the timer from where it left off
+
+    }
+
+    neureset->startSession();
+
+}
 
 void MainWindow::onPauseButtonClicked() {
     // pause session
-    qInfo("Session paused");
+    if (neureset->isSessionInProgress()) {
+        qInfo("Session paused");
+        // Get remaining time
+        int remainingTime = sessionTimer->remainingTime();
+        qInfo("Remaining Time: %d", remainingTime);
+
+        sessionTimer->stop(); // Stop the timer when the session is paused.
+    }
+
     neureset->pauseSession();
+
 }
 
 void MainWindow::onStopButtonClicked() {
     // Stop the session
-    qInfo("Session ended");
+    if (neureset->isSessionInProgress()) {
+        qInfo("Session ended");
+        remainingTime = 0;
+        sessionTimer->stop(); // Stop the timer.
+
+
+    }
     neureset->endSession();
-    //greenTreatmentSignal(); //just testing here
+
+    
 }
 
 
@@ -294,8 +347,23 @@ void MainWindow::timerLabel() {
     showTimer = true;
 
     ui->listWidget->clear();
-    QString timeRemaining = ("Time Remaining");
+    QString timeRemaining = ("Timer for Session");
     ui->listWidget->addItem(timeRemaining);
+}
+
+void MainWindow::updateTimerLabel() {
+    if (powerOn && showTimer){
+        // Get remaining time in milliseconds
+        int remainingTimeMs = sessionTimer->remainingTime();
+
+        // Convert milliseconds to seconds
+        int remainingTimeSec = remainingTimeMs / 1000;
+        
+        ui->listWidget->clear();
+        // Update the timer label with the remaining seconds
+        QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+        ui->listWidget->addItem(timeRemaining);
+    }
 }
 
 
