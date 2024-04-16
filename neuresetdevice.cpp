@@ -103,8 +103,8 @@ void NeuresetDevice::pauseSession() {
         eegHeadset->pauseSession();
         sessionPaused = true;
         
-        pauseTimer->start(30000); // Testing with shorter time
-        //pauseTimer->start(300000); // Five minutes on the clock (300000 ms)
+        //pauseTimer->start(30000); // Testing with shorter time
+        pauseTimer->start(300000); // Five minutes on the clock (300000 ms)
     }
     else {
         qInfo("No session in progress");
