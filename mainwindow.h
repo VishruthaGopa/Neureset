@@ -36,7 +36,8 @@ private:
     QTimer *sessionTimer;
     int totalDuration = 29000;
     int remainingTime; 
-
+    bool eegContactEstablished = false;
+    QTimer *flashTimer;
 
 private slots:
     void navigateUpMenu();
