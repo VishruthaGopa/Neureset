@@ -297,24 +297,24 @@ void MainWindow::onPauseButtonClicked() {
         qInfo("Remaining Time: %d", remainingTime);
 
         sessionTimer->stop(); // Stop the timer when the session is paused.
+
+        qInfo("Paused Time: %d", sessionTimer->remainingTime());
+
     }
 
     neureset->pauseSession();
-
 }
 
 void MainWindow::onStopButtonClicked() {
     // Stop the session
     if (neureset->isSessionInProgress()) {
         qInfo("Session ended");
-        remainingTime = 0;
+        //remainingTime = 0;
         sessionTimer->stop(); // Stop the timer.
 
 
     }
     neureset->endSession();
-
-    
 }
 
 
@@ -353,6 +353,7 @@ void MainWindow::timerLabel() {
 
 void MainWindow::updateTimerLabel() {
     if (powerOn && showTimer){
+        QString timeRemaining;
         // Get remaining time in milliseconds
         int remainingTimeMs = sessionTimer->remainingTime();
 
@@ -360,8 +361,15 @@ void MainWindow::updateTimerLabel() {
         int remainingTimeSec = remainingTimeMs / 1000;
         
         ui->listWidget->clear();
+        
         // Update the timer label with the remaining seconds
-        QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+        //QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+        if (neureset->isSessionPaused()){
+            timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTime/1000);
+        }else{
+            timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+        }
+
         ui->listWidget->addItem(timeRemaining);
     }
 }
@@ -393,9 +401,9 @@ void MainWindow::toggleMenuVisibility() {
     ui->listWidget->clear();
     ui->dateTimeEdit->hide();
     ui->updateDateTimeButton->hide();
-
     if (!showMenuOptions) {
         showDateTimeEditActive = false;  
+        showTimer = false;
 
         // Define alternating colors
         QColor color1(235, 235, 235); // Light gray
@@ -427,8 +435,6 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
-
-    // lose 1/3 of a progress. 
 
 }
 
