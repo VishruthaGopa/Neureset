@@ -5,7 +5,6 @@
 #include<QTimer>
 #include "sessionlog.h"
 #include "eegheadset.h"
-#include "counter.h"
 #include "sessionlog.h"
 #include "session.h"
 #include "electrode.h"
