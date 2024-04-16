@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up the QTimer to check battery level periodically
     QTimer *batteryCheckTimer = new QTimer(this);
     connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
-    batteryCheckTimer->start(5000); // Check battery level every 5 seconds
+    batteryCheckTimer->start(1000); // Check battery level every 5 seconds
 }
 
 MainWindow::~MainWindow()
@@ -109,11 +109,23 @@ void MainWindow::checkBatteryLevel() {
     }else if(batteryDied && batteryLevel>=0) {
         powerOn = true;
         deviceOn();
-        onStartButtonClicked(); //Resume Session after battery dies and user increases battery?
-
         //qInfo("Battery Level: %d", batteryLevel);
         batteryDied = false;
     }
+
+    QString sliderStyle = "groove:horizontal { border: 5px solid #5c5c5c; border-radius: 10px; height: 1px; margin: 2px 0; }"; // change the horizontal groove with rounded corners
+    sliderStyle += "QSlider::sub-page:horizontal { background: green; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the left side of the handle with border and rounded corners
+    sliderStyle += "QSlider::add-page:horizontal { background: #ECECEC; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the right side of the handle with border and rounded corners
+    sliderStyle += "QSlider::handle:horizontal { background: white; border: 0.5px solid #5c5c5c; width: 6px; height: 6px; margin: -3px 0; border-radius: 3px; }";
+
+
+    // Change green to red if battery level is less than or equal to 15
+    if (batteryLevel <= 15) {
+        sliderStyle.replace("background: green", "background: red");
+    }
+
+    ui->batterySlider->setStyleSheet(sliderStyle);
+
 }
 
 void MainWindow::navigateUpMenu() {
