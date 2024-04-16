@@ -2,7 +2,7 @@
 #define TRANSFERWINDOW_H
 
 #include <QDialog>
-#include "Session.h"
+#include "session.h"
 
 namespace Ui {
 class TransferWindow;
