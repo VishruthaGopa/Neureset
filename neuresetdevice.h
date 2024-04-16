@@ -51,6 +51,11 @@ public:
     void measurementHandler();
     void treatNextHandler(double frequency);
 
+    // session states
+    bool isSessionInProgress() const { return sessionInProgress; }
+    bool isSessionPaused() const { return sessionPaused; }
+
+
 signals:
      void sessionProgress(int percentage);
      void treatmentAppliedSignal(); //green light signal

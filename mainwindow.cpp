@@ -88,6 +88,15 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *batteryCheckTimer = new QTimer(this);
     connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
     batteryCheckTimer->start(1000); // Check battery level every 5 seconds
+
+    // Initialize sessionTimer
+    sessionTimer = new QTimer(this);
+
+    // Set up the countdownTimer
+    QTimer *countdownTimer = new QTimer(this);
+    connect(countdownTimer, SIGNAL(timeout()), this, SLOT(updateTimerLabel()));
+    countdownTimer->start(1000); // Display updates every 1 second
+
 }
 
 MainWindow::~MainWindow()
@@ -230,13 +239,6 @@ void MainWindow::onSessionLogRequested(){
     //display session data
     ui->listWidget->addItem(sessionDataString);
 }
-void MainWindow::onStartButtonClicked() {
-    // Starting a new session or resuming
-    qInfo("Session started/resume");
-    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
-    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-    neureset->startSession();
-}
 
 void MainWindow::greenTreatmentSignal() {
     // Set the treatment light to bright green
@@ -263,18 +265,56 @@ void MainWindow::greenTreatmentSignal() {
 
 }
 
+void MainWindow::onStartButtonClicked() {
+    // Starting a new session or resuming
+
+    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+    
+    // Check if session if no session is in progress
+    if (!neureset->isSessionInProgress()) {
+        qInfo("Session started");
+
+        // Start session timer for 29 seconds
+        sessionTimer->start(totalDuration);
+        
+    }else if(neureset->isSessionPaused()){
+        qInfo("Session resumed");
+        sessionTimer->start(remainingTime); // Resume the timer from where it left off
+
+    }
+
+    neureset->startSession();
+
+}
 
 void MainWindow::onPauseButtonClicked() {
     // pause session
-    qInfo("Session paused");
+    if (neureset->isSessionInProgress()) {
+        qInfo("Session paused");
+        // Get remaining time
+        int remainingTime = sessionTimer->remainingTime();
+        qInfo("Remaining Time: %d", remainingTime);
+
+        sessionTimer->stop(); // Stop the timer when the session is paused.
+    }
+
     neureset->pauseSession();
+
 }
 
 void MainWindow::onStopButtonClicked() {
     // Stop the session
-    qInfo("Session ended");
+    if (neureset->isSessionInProgress()) {
+        qInfo("Session ended");
+        remainingTime = 0;
+        sessionTimer->stop(); // Stop the timer.
+
+
+    }
     neureset->endSession();
-    //greenTreatmentSignal(); //just testing here
+
+    
 }
 
 
@@ -307,8 +347,23 @@ void MainWindow::timerLabel() {
     showTimer = true;
 
     ui->listWidget->clear();
-    QString timeRemaining = ("Time Remaining");
+    QString timeRemaining = ("Timer for Session");
     ui->listWidget->addItem(timeRemaining);
+}
+
+void MainWindow::updateTimerLabel() {
+    if (powerOn && showTimer){
+        // Get remaining time in milliseconds
+        int remainingTimeMs = sessionTimer->remainingTime();
+
+        // Convert milliseconds to seconds
+        int remainingTimeSec = remainingTimeMs / 1000;
+        
+        ui->listWidget->clear();
+        // Update the timer label with the remaining seconds
+        QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+        ui->listWidget->addItem(timeRemaining);
+    }
 }
 
 
