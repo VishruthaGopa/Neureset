@@ -101,6 +101,7 @@ void NeuresetDevice::endSession() {
 void NeuresetDevice::pauseSession() {
     if (sessionInProgress) {
         eegHeadset->pauseSession();
+        sessionPaused = true;
         pauseTimer->start(300000); // Five minutes on the clock (300000 ms)
     }
     else {
@@ -111,6 +112,7 @@ void NeuresetDevice::pauseSession() {
 void NeuresetDevice::resumeSession() {
     if (sessionInProgress) {
         pauseTimer->stop();
+        sessionPaused = false;
         eegHeadset->resumeSession();
     }
     else {

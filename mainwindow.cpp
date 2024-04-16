@@ -95,7 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up the countdownTimer
     QTimer *countdownTimer = new QTimer(this);
     connect(countdownTimer, SIGNAL(timeout()), this, SLOT(updateTimerLabel()));
-    countdownTimer->start(1000); // Display updates every 1 second
+    countdownTimer->start(500); // Display updates every half second
 
 }
 
@@ -110,10 +110,10 @@ void MainWindow::checkBatteryLevel() {
         powerOn = false;
         batteryDied = true;
         qInfo("Battery Level: %d", batteryLevel);
-        onPauseButtonClicked(); // Pause Session if battery dies?
+        onStopButtonClicked(); // End Session if battery dies
 
         deviceOff();
-        QString item = "Check battery.";
+        QString item = "Battery died.";
         ui->listWidget->addItem(item);
     }else if(batteryDied && batteryLevel>=0) {
         powerOn = true;
@@ -292,31 +292,38 @@ void MainWindow::onPauseButtonClicked() {
     // pause session
     if (neureset->isSessionInProgress()) {
         qInfo("Session paused");
-        // Get remaining time
-        int remainingTime = sessionTimer->remainingTime();
-        qInfo("Remaining Time: %d", remainingTime);
+        // Save remaining time after pause
+        remainingTime = sessionTimer->remainingTime();
+        qInfo("Remaining Time after pause: %d", remainingTime);
 
         sessionTimer->stop(); // Stop the timer when the session is paused.
+        qInfo("after pause: %d", remainingTime);
+
+        // qInfo("Paused Time: %d", sessionTimer->remainingTime()); // inactive timer so -1
+
     }
 
     neureset->pauseSession();
-
 }
 
 void MainWindow::onStopButtonClicked() {
     // Stop the session
     if (neureset->isSessionInProgress()) {
         qInfo("Session ended");
+        neureset->endSession();
+
         remainingTime = 0;
         sessionTimer->stop(); // Stop the timer.
 
-
+        ui->listWidget->clear();
+        ui->listWidget->addItem("Session ended.");
+    }else{
+        qInfo("No Session in Progress");
     }
-    neureset->endSession();
 
-    
+    ui->progressBar->setValue(0);
+
 }
-
 
 void MainWindow::handleEEGHeadsetPanel() {
     QPushButton *button = qobject_cast<QPushButton*>(sender());
@@ -352,17 +359,36 @@ void MainWindow::timerLabel() {
 }
 
 void MainWindow::updateTimerLabel() {
-    if (powerOn && showTimer){
-        // Get remaining time in milliseconds
-        int remainingTimeMs = sessionTimer->remainingTime();
+    if (powerOn && showTimer && neureset->isSessionInProgress()){  
+        //qInfo("updateTimerLabel");
+        //qInfo("Paused? %s", neureset->isSessionPaused() ? "true" : "false");
 
-        // Convert milliseconds to seconds
-        int remainingTimeSec = remainingTimeMs / 1000;
-        
         ui->listWidget->clear();
-        // Update the timer label with the remaining seconds
-        QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
-        ui->listWidget->addItem(timeRemaining);
+        QString timeRemainingStr;      
+        //QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+
+        // Check if the session is paused
+        if (!neureset->isSessionPaused()){
+            // Session is not paused, update remaining time normally
+            
+            // Get remaining time in milliseconds
+            int remainingTimeMs = sessionTimer->remainingTime();
+            int remainingTimeSec = remainingTimeMs / 1000;
+
+            // Convert milliseconds to seconds
+            timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+
+        }else{
+            // Session is paused, use previously calculated remainingTime
+            //qInfo("Paused time: %d", remainingTime);
+
+            // Update the timer label with the remaining seconds at paused
+            timeRemainingStr = QString("Time Remaining: %1 seconds").arg((remainingTime / 1000));
+            ui->listWidget->addItem("Session paused.");
+
+        }
+
+        ui->listWidget->addItem(timeRemainingStr);
     }
 }
 
@@ -393,9 +419,9 @@ void MainWindow::toggleMenuVisibility() {
     ui->listWidget->clear();
     ui->dateTimeEdit->hide();
     ui->updateDateTimeButton->hide();
-
     if (!showMenuOptions) {
         showDateTimeEditActive = false;  
+        showTimer = false;
 
         // Define alternating colors
         QColor color1(235, 235, 235); // Light gray
@@ -427,8 +453,6 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
-
-    // lose 1/3 of a progress. 
 
 }
 
