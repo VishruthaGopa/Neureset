@@ -14,7 +14,7 @@ class PCWindow : public QMainWindow
     Q_OBJECT
 
     public:
-        PCWindow(QWidget *parent = nullptr);
+        PCWindow(NeuresetDevice*, QWidget *parent = nullptr);
         ~PCWindow();
 
         void setUpTable();
@@ -23,6 +23,7 @@ class PCWindow : public QMainWindow
         Ui::PCWindow *ui;
         PC* pc;
         DataModel model;
+        NeuresetDevice* device;
 
     private slots:
         void handleConnect();

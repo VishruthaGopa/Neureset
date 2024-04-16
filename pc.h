@@ -9,10 +9,11 @@ class PC : public QObject
 {
     Q_OBJECT
     public:
-        explicit PC(QObject *parent = nullptr);
+        explicit PC(NeuresetDevice*, QObject *parent = nullptr);
 
         // functions
-        void retrieveSessions(QList<Session*>* sessions);
+//        void retrieveSessions(QList<Session*>* sessions);
+        void retrieveSessions();
         void cancelCommit();
         void commitToDb();
         void save(const QDateTime& start, const QDateTime& end, const double before, const double after);

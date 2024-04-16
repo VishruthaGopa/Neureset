@@ -3,14 +3,14 @@
 #include "transferwindow.h"
 #include <QtDebug>
 
-PCWindow::PCWindow(QWidget *parent)
+PCWindow::PCWindow(NeuresetDevice* nd, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PCWindow)
 {
     ui->setupUi(this);
 
     // instantiate pc
-    pc = new PC();
+    pc = new PC(nd);
 
     // create table model view
     setUpTable();
@@ -47,22 +47,22 @@ void PCWindow::handleTransfer() {
     // pc->retrieveSessions();
 
     // test
-    Session* s = new Session();
-    Session* s2 = new Session();
-    s->startTimer();
-    s->endTimer();
-    s->setBeforeBaseline(69);
-    s->setAfterBaseline(420);
-    s2->startTimer();
-    s2->endTimer();
-    s2->setBeforeBaseline(727);
-    s2->setAfterBaseline(727);
-    QList<Session*> list;
-    list.append(s);
-    list.append(s2);
-    pc->retrieveSessions(&list);
+//    Session* s = new Session();
+//    Session* s2 = new Session();
+//    s->startTimer();
+//    s->endTimer();
+//    s->setBeforeBaseline(69);
+//    s->setAfterBaseline(420);
+//    s2->startTimer();
+//    s2->endTimer();
+//    s2->setBeforeBaseline(727);
+//    s2->setAfterBaseline(727);
+//    QList<Session*> list;
+//    list.append(s);
+//    list.append(s2);
+//    pc->retrieveSessions(&list);
     // end hard code
-
+    pc->retrieveSessions();
     TransferWindow* transferWindow = new TransferWindow(this);
     transferWindow->displaySessions(pc->getSessionLogsBuf());
     transferWindow->exec();
