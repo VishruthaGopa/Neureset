@@ -267,24 +267,27 @@ void MainWindow::greenTreatmentSignal() {
 
 void MainWindow::onStartButtonClicked() {
     // Starting a new session or resuming
-
-    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
-    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-    
-    // Check if session if no session is in progress
-    if (!neureset->isSessionInProgress()) {
-        qInfo("Session started");
-
-        // Start session timer for 29 seconds
-        sessionTimer->start(totalDuration);
+    if (eegContactEstablished){
+        ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
+        ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
         
-    }else if(neureset->isSessionPaused()){
-        qInfo("Session resumed");
-        sessionTimer->start(remainingTime); // Resume the timer from where it left off
+        // Check if session if no session is in progress
+        if (!neureset->isSessionInProgress()) {
+            qInfo("Session started");
 
+            // Start session timer for 29 seconds
+            sessionTimer->start(totalDuration);
+            
+        }else if(neureset->isSessionPaused()){
+            qInfo("Session resumed");
+            sessionTimer->start(remainingTime); // Resume the timer from where it left off
+
+        }
+        neureset->startSession();
+    }else{
+        ui->listWidget->clear();
+        ui->listWidget->addItem("Connect to EEG Headset.");
     }
-
-    neureset->startSession();
 
 }
 
@@ -331,17 +334,50 @@ void MainWindow::handleEEGHeadsetPanel() {
     if (button == ui->establishContactButton) {
         // Logic for establishing contact with EEG headset
         qInfo("Establishing contact with EEG headset...");
+        eegContactEstablished = true;
 
         // Enable the lose contact button
         ui->loseContactButton->setEnabled(true);
         ui->establishContactButton->setEnabled(false);
 
+        if (neureset->isSessionInProgress()) {
+            onStartButtonClicked(); //Resume
+        }
+
+        // If contact is reestablished, stop flashing
+        if (flashTimer && flashTimer->isActive()) {
+            flashTimer->stop();
+            // Set the contactLostLight back to dull red
+            ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+        }
+
+
     } else if (button == ui->loseContactButton) {
         // Logic for losing contact with EEG headset
         qInfo("Losing contact with EEG headset...");
+        eegContactEstablished = false;
         ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
-        ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
 
+        onPauseButtonClicked(); // pause session
+        
+        if (neureset->isSessionInProgress()) {
+            // Flash red light until contact is reestablished
+            ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
+            ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // bright red
+
+            // Toggle between dull and bright red using a QTimer
+            flashTimer = new QTimer(this);
+            connect(flashTimer, &QTimer::timeout, this, [=]() {
+                static bool brightRed = false;
+                if (brightRed) {
+                    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+                } else {
+                    ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // bright red
+                }
+                brightRed = !brightRed;
+            });
+            flashTimer->start(500); // Flashing interval
+        }
         // Enable the establish contact button
         ui->establishContactButton->setEnabled(true);
         ui->loseContactButton->setEnabled(false);

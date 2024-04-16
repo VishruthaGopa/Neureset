@@ -12,7 +12,6 @@ class PC : public QObject
         explicit PC(NeuresetDevice*, QObject *parent = nullptr);
 
         // functions
-//        void retrieveSessions(QList<Session*>* sessions);
         void retrieveSessions();
         void cancelCommit();
         void commitToDb();
