@@ -3,7 +3,7 @@
 
 NeuresetDevice::NeuresetDevice(EEGHeadset* headset, QObject* parent) : QObject(parent), sessionInProgress(false), stage(0){
     pauseTimer = new QTimer(this);
-    QObject::connect(pauseTimer, &QTimer::timeout, this, &NeuresetDevice::cancelSession);
+    QObject::connect(pauseTimer, &QTimer::timeout, this, &NeuresetDevice::pauseTimerOver);
 
     sessionLog = new SessionLog();
     eegHeadset = headset;
@@ -102,7 +102,9 @@ void NeuresetDevice::pauseSession() {
     if (sessionInProgress) {
         eegHeadset->pauseSession();
         sessionPaused = true;
-        pauseTimer->start(300000); // Five minutes on the clock (300000 ms)
+        
+        pauseTimer->start(30000); // Testing with shorter time
+        //pauseTimer->start(300000); // Five minutes on the clock (300000 ms)
     }
     else {
         qInfo("No session in progress");
@@ -126,12 +128,25 @@ void NeuresetDevice::cancelSession() {
         pauseTimer->stop();
         sessionInProgress = false;
         percentage = 0;
+        sessionPaused = false;
         emit sessionProgress(percentage);
     }
     else {
         qInfo("No Session in Progress");
     }
 }
+
+void NeuresetDevice::pauseTimerOver(){
+    // after 5 mins contact is not restablished
+    cancelSession();
+
+    // turn device off.
+    emit pauseTimerElapsed();
+
+    qInfo("Pause timer elapsed");
+
+}
+
 
 void NeuresetDevice::handlePercentage() {
     currEvents++;

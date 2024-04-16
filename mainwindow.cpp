@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect greenTreatmentSignal slot
     //connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
     connect(neureset, &NeuresetDevice::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
+    connect(neureset, &NeuresetDevice::pauseTimerElapsed, this, &MainWindow::pauseTimerElapsed);
 
     // Connect uploadPCButton and showWaveformButton signal
     connect(ui->uploadPCButton, &QPushButton::clicked, this, &MainWindow::uploadPCButtonClicked);
@@ -292,39 +293,42 @@ void MainWindow::onStartButtonClicked() {
 }
 
 void MainWindow::onPauseButtonClicked() {
-    // pause session
-    if (neureset->isSessionInProgress()) {
-        qInfo("Session paused");
-        // Save remaining time after pause
-        remainingTime = sessionTimer->remainingTime();
-        qInfo("Remaining Time after pause: %d", remainingTime);
+    if (eegContactEstablished){
+        // pause session
+        if (neureset->isSessionInProgress()) {
+            qInfo("Session paused");
+            // Save remaining time after pause
+            remainingTime = sessionTimer->remainingTime();
+            qInfo("Remaining Time after pause: %d", remainingTime);
 
-        sessionTimer->stop(); // Stop the timer when the session is paused.
-        qInfo("after pause: %d", remainingTime);
+            sessionTimer->stop(); // Stop the timer when the session is paused.
+            qInfo("after pause: %d", remainingTime);
 
-        // qInfo("Paused Time: %d", sessionTimer->remainingTime()); // inactive timer so -1
+            // qInfo("Paused Time: %d", sessionTimer->remainingTime()); // inactive timer so -1
+        }
 
+        neureset->pauseSession();
     }
-
-    neureset->pauseSession();
 }
 
 void MainWindow::onStopButtonClicked() {
-    // Stop the session
-    if (neureset->isSessionInProgress()) {
-        qInfo("Session ended");
-        neureset->endSession();
+    if (eegContactEstablished){
+        // Stop the session
+        if (neureset->isSessionInProgress()) {
+            qInfo("Session ended");
+            neureset->endSession();
 
-        remainingTime = 0;
-        sessionTimer->stop(); // Stop the timer.
+            remainingTime = 0;
+            sessionTimer->stop(); // Stop the timer.
 
-        ui->listWidget->clear();
-        ui->listWidget->addItem("Session ended.");
-    }else{
-        qInfo("No Session in Progress");
+            ui->listWidget->clear();
+            ui->listWidget->addItem("Session ended.");
+        }else{
+            qInfo("No Session in Progress");
+        }
+
+        ui->progressBar->setValue(0);
     }
-
-    ui->progressBar->setValue(0);
 
 }
 
@@ -390,7 +394,7 @@ void MainWindow::timerLabel() {
     showTimer = true;
 
     ui->listWidget->clear();
-    QString timeRemaining = ("Timer for Session");
+    QString timeRemaining = ("Neureset Device");
     ui->listWidget->addItem(timeRemaining);
 }
 
@@ -532,4 +536,16 @@ void MainWindow::uploadPCButtonClicked() {
 
 void MainWindow::showWaveformButtonClicked() {
     qInfo("Show Waveform");
+}
+
+void MainWindow::pauseTimerElapsed() {
+    qInfo("Session Cancelled. EEG Headset contact was not restablished");
+
+    remainingTime = 0;
+    sessionTimer->stop(); // Stop the timer.
+
+    ui->listWidget->clear();
+    ui->listWidget->addItem("Session ended.");
+    
+    deviceOff();
 }

@@ -49,8 +49,7 @@ public:
     void onTreatmentCompleted(double frequency);
     void measurementHandler();
     void treatNextHandler(double frequency);
-
-    // session states
+    void pauseTimerOver();
     bool isSessionInProgress() const { return sessionInProgress; }
     bool isSessionPaused() const { return sessionPaused; }
 
@@ -58,6 +57,7 @@ public:
 signals:
      void sessionProgress(int percentage);
      void treatmentAppliedSignal(); //green light signal
+     void pauseTimerElapsed();
 
 };
 

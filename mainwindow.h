@@ -61,6 +61,7 @@ private slots:
     void showWaveformButtonClicked();
     void checkBatteryLevel();
     void updateTimerLabel();
+    void pauseTimerElapsed();
 
 };
 #endif // MAINWINDOW_H
