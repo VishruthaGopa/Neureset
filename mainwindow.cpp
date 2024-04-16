@@ -110,10 +110,10 @@ void MainWindow::checkBatteryLevel() {
         powerOn = false;
         batteryDied = true;
         qInfo("Battery Level: %d", batteryLevel);
-        onPauseButtonClicked(); // Pause Session if battery dies?
+        onStopButtonClicked(); // End Session if battery dies
 
         deviceOff();
-        QString item = "Check battery.";
+        QString item = "Battery died.";
         ui->listWidget->addItem(item);
     }else if(batteryDied && batteryLevel>=0) {
         powerOn = true;
@@ -310,14 +310,20 @@ void MainWindow::onStopButtonClicked() {
     // Stop the session
     if (neureset->isSessionInProgress()) {
         qInfo("Session ended");
-        //remainingTime = 0;
+        neureset->endSession();
+
+        remainingTime = 0;
         sessionTimer->stop(); // Stop the timer.
 
-
+        ui->listWidget->clear();
+        ui->listWidget->addItem("Session ended.");
+    }else{
+        qInfo("No Session in Progress");
     }
-    neureset->endSession();
-}
 
+    ui->progressBar->setValue(0);
+
+}
 
 void MainWindow::handleEEGHeadsetPanel() {
     QPushButton *button = qobject_cast<QPushButton*>(sender());
@@ -378,6 +384,7 @@ void MainWindow::updateTimerLabel() {
 
             // Update the timer label with the remaining seconds at paused
             timeRemainingStr = QString("Time Remaining: %1 seconds").arg((remainingTime / 1000));
+            ui->listWidget->addItem("Session paused.");
 
         }
 
