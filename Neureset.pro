@@ -1,4 +1,4 @@
-QT += core gui
+QT += core gui sql
 QT += concurrent
 QT += charts
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -16,7 +16,12 @@ SOURCES += \
     mainwindow.cpp \
     neuresetdevice.cpp \
     session.cpp \
-    sessionlog.cpp
+    sessionlog.cpp \
+    datamodel.cpp \
+    dbmanager.cpp \
+    pc.cpp \
+    pcwindow.cpp \
+    transferwindow.cpp
 
 HEADERS += \
     eegheadset.h \
@@ -24,10 +29,17 @@ HEADERS += \
     mainwindow.h \
     neuresetdevice.h \
     session.h \
-    sessionlog.h
+    sessionlog.h \
+    datamodel.h \
+    dbmanager.h \
+    pc.h \
+    pcwindow.h \
+    transferwindow.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    pcwindow.ui \
+    transferwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

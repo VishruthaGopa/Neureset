@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include "neuresetdevice.h"
 #include <QTimer>
+#include "pcwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

@@ -524,6 +524,10 @@ void MainWindow::deviceOff(){
 
 void MainWindow::uploadPCButtonClicked() {
     qInfo("Upload Data to PC");
+
+    // create pc
+    PCWindow* pc = new PCWindow(neureset, this);
+    pc->show();
 }
 
 void MainWindow::showWaveformButtonClicked() {

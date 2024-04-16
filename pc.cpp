@@ -1,17 +1,20 @@
 #include "pc.h"
 #include <QtDebug>
 
-PC::PC(QObject *parent): QObject{parent}{
+PC::PC(NeuresetDevice* nd, QObject *parent): QObject{parent}{
     isConnected = false;
     sessionLogsBuf = nullptr;
+    device = nd;
 }
 
-void PC::retrieveSessions(QList<Session*>* sessions) {
+void PC::retrieveSessions() {
     // store sessions in temporary buffer, retrieved from Neureset device or from provided argument
     sessionLogsBuf = new QList<Session*>;
 
-    if (sessions != nullptr) {
-        *sessionLogsBuf = *sessions;
+    QList<Session*> sessions = device->getSessionLog()->getSessionHistory();
+
+    if (sessions.length() != 0) {
+        *sessionLogsBuf = sessions;
     }
     else {
         *sessionLogsBuf = device->getSessionLog()->getSessionHistory();
