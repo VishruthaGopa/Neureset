@@ -394,7 +394,7 @@ void MainWindow::timerLabel() {
     showTimer = true;
 
     ui->listWidget->clear();
-    QString timeRemaining = ("Neureset Device");
+    QString timeRemaining = ("Neureset Device is On.");
     ui->listWidget->addItem(timeRemaining);
 }
 
