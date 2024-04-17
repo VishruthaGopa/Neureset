@@ -23,6 +23,9 @@ public:
     void setAfterBaseline(double baseline);
     void startTimer();
     void endTimer();
+    void startTimer(const QDateTime &currentTime);
+    void endTimer(const QDateTime &currentTime);
+
 };
 
 #endif // SESSION_H

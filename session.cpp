@@ -18,3 +18,7 @@ void Session::setAfterBaseline(double baseline) { afterBaseline = baseline; }
 void Session::startTimer(){startTime=QDateTime::currentDateTime();}
 
 void Session::endTimer(){endTime=QDateTime::currentDateTime();}
+
+void Session::startTimer(const QDateTime &currentTime) { startTime = currentTime;}
+
+void Session::endTimer(const QDateTime &currentTime) { endTime = currentTime;}

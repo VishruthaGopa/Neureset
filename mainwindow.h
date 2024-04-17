@@ -62,6 +62,6 @@ private slots:
     void checkBatteryLevel();
     void updateTimerLabel();
     void pauseTimerElapsed();
-
+    void setEEGDateTime();
 };
 #endif // MAINWINDOW_H

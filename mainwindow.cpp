@@ -53,6 +53,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(neureset,&NeuresetDevice::sessionProgress,this,&MainWindow::updateProgress);
 
+    // Slot in Mainwindow to update  mainwindowDateTime for sessions in EEG headset
+    connect(eegheadset,&EEGHeadset::updateDateTime,this,&MainWindow::setEEGDateTime);
+
     // Connect batterySlider signal to handleBatteryLevelChanged slot
     connect(ui->batterySlider, &QSlider::sliderReleased, this, &MainWindow::handleBatteryLevelChanged);
 
@@ -104,6 +107,12 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
+void MainWindow::setEEGDateTime(){
+    eegheadset -> mainwindowDateTime = updatedDateTime;
+}
+
 
 void MainWindow::checkBatteryLevel() {
     int batteryLevel = ui->batterySlider->value();

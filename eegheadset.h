@@ -10,7 +10,7 @@
 #include<QtConcurrent/QtConcurrent>
 #include "session.h"
 #include "electrode.h"
-
+#include <QDateTime>
 
 class EEGHeadset : public QObject {
     Q_OBJECT
@@ -28,9 +28,9 @@ private:
     QEventLoop loop;
     bool paused;
 
-
 public:
     EEGHeadset(QObject* parent = nullptr);
+    QDateTime mainwindowDateTime; // Date and time from mainwindow
 
     // Destructor to free memory allocated for electrodes
     ~EEGHeadset();
@@ -55,9 +55,10 @@ public:
 
 
 signals:
-    void newSession(Session *session);
+    void newSession(Session *session, QDateTime &mainwindowDateTime);
     void treatmentCompleted(double feq);
     void measurementCompleted();
+    void updateDateTime();
     //void treatmentAppliedSignal(); //green light signal
 };
 

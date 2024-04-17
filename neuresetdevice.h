@@ -40,7 +40,7 @@ public:
     NeuresetDevice(EEGHeadset* headset, QObject* parent = nullptr);
     void startSession();  
     SessionLog* getSessionLog() const { return sessionLog; }
-    void gotNewSession(Session* session);
+    void gotNewSession(Session* session, QDateTime &mainwindowDateTime);
     void endSession();
     void pauseSession();
     void resumeSession();

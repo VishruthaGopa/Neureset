@@ -84,8 +84,14 @@ void EEGHeadset::handleBaseline(double frequency) {
            double average = calculateDominantFrequency(baselineFrequencies);
            session->setAfterBaseline(average);
            qDebug() << "Average after frequency:" << average;
+           
+           // get updated date and time
+            emit updateDateTime();
+            qInfo("EEG Headset Time Updated: %s", qPrintable(mainwindowDateTime.toString()));
+
            //send out session details
-           emit newSession(session);
+           emit newSession(session, mainwindowDateTime);
+           
            createNewSession();
            //cleanup data from electrodes
            afterFrequencies.clear();
@@ -211,5 +217,8 @@ void EEGHeadset::resumeSession() {
 }
 
 void EEGHeadset::startSession(){
-    session->startTimer();
+    emit updateDateTime();
+    qInfo("EEG Headset Time Updated: %s", qPrintable(mainwindowDateTime.toString()));
+
+    session->startTimer(mainwindowDateTime);
 }

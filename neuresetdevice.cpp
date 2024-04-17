@@ -24,8 +24,8 @@ void NeuresetDevice::stopTreatment() {
 
 }
 
-void NeuresetDevice::gotNewSession(Session* session) {
-    session->endTimer();
+void NeuresetDevice::gotNewSession(Session* session, QDateTime &mainwindowDateTime) {
+    session->endTimer(mainwindowDateTime);
     sessionLog->addSession(session);
 }
 
