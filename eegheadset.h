@@ -10,7 +10,13 @@
 #include<QtConcurrent/QtConcurrent>
 #include "session.h"
 #include "electrode.h"
-#include <QDateTime>
+#include <vector>
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QtCharts/QChartView>
+
+
+
 
 class EEGHeadset : public QObject {
     Q_OBJECT
@@ -27,10 +33,11 @@ private:
     QTimer* calculationTimer;
     QEventLoop loop;
     bool paused;
+    std::vector<Electrode*> electrodes;
+
 
 public:
     EEGHeadset(QObject* parent = nullptr);
-    QDateTime mainwindowDateTime; // Date and time from mainwindow
 
     // Destructor to free memory allocated for electrodes
     ~EEGHeadset();
@@ -43,7 +50,7 @@ public:
     void handleBaseline(double frequency);
     void handleTreatmentApplied(double frequency);
     //handle required timing
-    void wait(int seconds);
+    void wait(double seconds);
     void pauseSession();
     void startTreatment(double frequency);
     void resumeSession();
@@ -52,13 +59,12 @@ public:
     // Function to calculate FFT and return dominant frequency
     double calculateDominantFrequency(const QVector<double> &frequencies);
     void cancelSession();
-
+    QVector<Electrode*> getElectrodes(){return electrodeSites;}
 
 signals:
-    void newSession(Session *session, QDateTime &mainwindowDateTime);
+    void newSession(Session *session);
     void treatmentCompleted(double feq);
     void measurementCompleted();
-    void updateDateTime();
     //void treatmentAppliedSignal(); //green light signal
 };
 

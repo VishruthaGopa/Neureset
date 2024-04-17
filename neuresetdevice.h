@@ -5,6 +5,7 @@
 #include<QTimer>
 #include "sessionlog.h"
 #include "eegheadset.h"
+#include "counter.h"
 #include "sessionlog.h"
 #include "session.h"
 #include "electrode.h"
@@ -40,24 +41,21 @@ public:
     NeuresetDevice(EEGHeadset* headset, QObject* parent = nullptr);
     void startSession();  
     SessionLog* getSessionLog() const { return sessionLog; }
-    void gotNewSession(Session* session, QDateTime &mainwindowDateTime);
+    void gotNewSession(Session* session);
     void endSession();
     void pauseSession();
     void resumeSession();
     void cancelSession();
+    EEGHeadset* getHeadset();
     void handlePercentage();
     void onTreatmentCompleted(double frequency);
     void measurementHandler();
     void treatNextHandler(double frequency);
-    void pauseTimerOver();
-    bool isSessionInProgress() const { return sessionInProgress; }
-    bool isSessionPaused() const { return sessionPaused; }
-
+    QVector<Electrode*> getElectrodes(){return eegHeadset->getElectrodes();}
 
 signals:
      void sessionProgress(int percentage);
      void treatmentAppliedSignal(); //green light signal
-     void pauseTimerElapsed();
 
 };
 

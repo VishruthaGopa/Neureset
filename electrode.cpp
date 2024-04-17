@@ -21,9 +21,11 @@ double Electrode::calculateBaseline() {
     qInfo("Generating WaveForm for Electrode, %d",id);
     if(baselineFrequency==0){
         generateBrainWaveFrequency();
+        Beforewaveform=waveform;
     }
     else{
         generateFromBaseline();
+        Afterwaveform=waveform;
     }
     baselineFrequency=calculateDominantFrequency();
     emit baselineMeasured(baselineFrequency);
@@ -49,9 +51,7 @@ void Electrode::applyTreatment() {
 void Electrode::generateBrainWaveFrequency() {
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0, 4); // For selecting one of the five types
-
     int waveType = distribution(generator); // 0: alpha, 1: beta, 2: delta, 3: theta, 4: gamma
-
     switch(waveType) {
         case 0: // Alpha wave
             generateAlphaWave();
@@ -211,7 +211,7 @@ double Electrode::calculateDominantFrequency() {
      }
 }
 
-void Electrode::plotWaveform() {
+QtCharts::QChartView* Electrode::plotWaveform(bool before) {
     // Create a new chart
     chart = new QtCharts::QChart();
     chart->setTitle("Brain Waveform");
@@ -219,11 +219,18 @@ void Electrode::plotWaveform() {
     // Create a new line series
     series = new QtCharts::QLineSeries();
 
-    // Populate the series with waveform data
-    for (unsigned long i = 0; i < waveform.size(); ++i) {
-        series->append(i, waveform[i]);
+    if(before==true){
+        // Populate the series with before waveform data
+        for (unsigned long i = 0; i < Beforewaveform.size(); ++i) {
+            series->append(i, Beforewaveform[i]);
+        }
     }
-
+    else{
+        // Populate the series with before waveform data
+        for (unsigned long i = 0; i < Afterwaveform.size(); ++i) {
+            series->append(i, Afterwaveform[i]);
+        }
+    }
     // Add the series to the chart
     chart->addSeries(series);
 
@@ -241,9 +248,10 @@ void Electrode::plotWaveform() {
     // Create a chart view to display the chart
     chartView = new QtCharts::QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-
-    // Show the chart view
-    chartView->show();
+    // Set a larger size for the chart view
+    chartView->setMinimumSize(640, 400); // Adjust the size as needed
+    // Return the chart view
+    return chartView;
 }
 
 
@@ -266,7 +274,6 @@ void Electrode::generateFromBaseline() {
     } else if (baselineFrequency > 30.0) {
         waveType = "Gamma";
     } else {
-        qWarning("Dominant frequency does not fall into known brainwave types.");
         return;
     }
 
@@ -282,9 +289,6 @@ void Electrode::generateFromBaseline() {
     } else if (waveType == "Gamma") {
         generateGammaWave();
     }
-
-    // Optionally, update the plot
-    // plotWaveform();
 }
 
 

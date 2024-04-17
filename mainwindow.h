@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include "neuresetdevice.h"
 #include <QTimer>
-#include "pcwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,11 +33,6 @@ private:
     void deviceOn();
     void showDateTimeEdit();
     QDateTime updatedDateTime;
-    QTimer *sessionTimer;
-    int totalDuration = 29000;
-    int remainingTime; 
-    bool eegContactEstablished = false;
-    QTimer *flashTimer;
 
 private slots:
     void navigateUpMenu();
@@ -60,8 +54,6 @@ private slots:
     void uploadPCButtonClicked();
     void showWaveformButtonClicked();
     void checkBatteryLevel();
-    void updateTimerLabel();
-    void pauseTimerElapsed();
-    void setEEGDateTime();
+
 };
 #endif // MAINWINDOW_H

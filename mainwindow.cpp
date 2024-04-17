@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "sliderwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -53,9 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(neureset,&NeuresetDevice::sessionProgress,this,&MainWindow::updateProgress);
 
-    // Slot in Mainwindow to update  mainwindowDateTime for sessions in EEG headset
-    connect(eegheadset,&EEGHeadset::updateDateTime,this,&MainWindow::setEEGDateTime);
-
     // Connect batterySlider signal to handleBatteryLevelChanged slot
     connect(ui->batterySlider, &QSlider::sliderReleased, this, &MainWindow::handleBatteryLevelChanged);
 
@@ -68,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Connect greenTreatmentSignal slot
     //connect(eegheadset, &EEGHeadset::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
     connect(neureset, &NeuresetDevice::treatmentAppliedSignal, this, &MainWindow::greenTreatmentSignal);
-    connect(neureset, &NeuresetDevice::pauseTimerElapsed, this, &MainWindow::pauseTimerElapsed);
 
     // Connect uploadPCButton and showWaveformButton signal
     connect(ui->uploadPCButton, &QPushButton::clicked, this, &MainWindow::uploadPCButtonClicked);
@@ -91,16 +88,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up the QTimer to check battery level periodically
     QTimer *batteryCheckTimer = new QTimer(this);
     connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
-    batteryCheckTimer->start(1000); // Check battery level every 5 seconds
-
-    // Initialize sessionTimer
-    sessionTimer = new QTimer(this);
-
-    // Set up the countdownTimer
-    QTimer *countdownTimer = new QTimer(this);
-    connect(countdownTimer, SIGNAL(timeout()), this, SLOT(updateTimerLabel()));
-    countdownTimer->start(500); // Display updates every half second
-
+    batteryCheckTimer->start(5000); // Check battery level every 5 seconds
 }
 
 MainWindow::~MainWindow()
@@ -108,43 +96,25 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-void MainWindow::setEEGDateTime(){
-    eegheadset -> mainwindowDateTime = updatedDateTime;
-}
-
-
 void MainWindow::checkBatteryLevel() {
     int batteryLevel = ui->batterySlider->value();
     if (batteryLevel <= 0) {
         powerOn = false;
         batteryDied = true;
         qInfo("Battery Level: %d", batteryLevel);
-        onStopButtonClicked(); // End Session if battery dies
+        onPauseButtonClicked(); // Pause Session if battery dies?
 
         deviceOff();
-        QString item = "Battery died.";
+        QString item = "Check battery.";
         ui->listWidget->addItem(item);
     }else if(batteryDied && batteryLevel>=0) {
         powerOn = true;
         deviceOn();
+        onStartButtonClicked(); //Resume Session after battery dies and user increases battery?
+
         //qInfo("Battery Level: %d", batteryLevel);
         batteryDied = false;
     }
-
-    QString sliderStyle = "groove:horizontal { border: 5px solid #5c5c5c; border-radius: 10px; height: 1px; margin: 2px 0; }"; // change the horizontal groove with rounded corners
-    sliderStyle += "QSlider::sub-page:horizontal { background: green; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the left side of the handle with border and rounded corners
-    sliderStyle += "QSlider::add-page:horizontal { background: #ECECEC; border: 1px solid #d4d4d4; border-radius: 10px; }"; // color for the right side of the handle with border and rounded corners
-    sliderStyle += "QSlider::handle:horizontal { background: white; border: 0.5px solid #5c5c5c; width: 6px; height: 6px; margin: -3px 0; border-radius: 3px; }";
-
-
-    // Change green to red if battery level is less than or equal to 15
-    if (batteryLevel <= 15) {
-        sliderStyle.replace("background: green", "background: red");
-    }
-
-    ui->batterySlider->setStyleSheet(sliderStyle);
-
 }
 
 void MainWindow::navigateUpMenu() {
@@ -249,6 +219,13 @@ void MainWindow::onSessionLogRequested(){
     //display session data
     ui->listWidget->addItem(sessionDataString);
 }
+void MainWindow::onStartButtonClicked() {
+    // Starting a new session or resuming
+    qInfo("Session started/resume");
+    ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
+    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
+    neureset->startSession();
+}
 
 void MainWindow::greenTreatmentSignal() {
     // Set the treatment light to bright green
@@ -275,71 +252,20 @@ void MainWindow::greenTreatmentSignal() {
 
 }
 
-void MainWindow::onStartButtonClicked() {
-    // Starting a new session or resuming
-    if (eegContactEstablished){
-        ui->contactLight->setStyleSheet("background-color: #2784D6;"); // brighter blue
-        ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-        
-        // Check if session if no session is in progress
-        if (!neureset->isSessionInProgress()) {
-            qInfo("Session started");
-
-            // Start session timer for 29 seconds
-            sessionTimer->start(totalDuration);
-            
-        }else if(neureset->isSessionPaused()){
-            qInfo("Session resumed");
-            sessionTimer->start(remainingTime); // Resume the timer from where it left off
-
-        }
-        neureset->startSession();
-    }else{
-        ui->listWidget->clear();
-        ui->listWidget->addItem("Connect to EEG Headset.");
-    }
-
-}
 
 void MainWindow::onPauseButtonClicked() {
-    if (eegContactEstablished){
-        // pause session
-        if (neureset->isSessionInProgress()) {
-            qInfo("Session paused");
-            // Save remaining time after pause
-            remainingTime = sessionTimer->remainingTime();
-            qInfo("Remaining Time after pause: %d", remainingTime);
-
-            sessionTimer->stop(); // Stop the timer when the session is paused.
-            qInfo("after pause: %d", remainingTime);
-
-            // qInfo("Paused Time: %d", sessionTimer->remainingTime()); // inactive timer so -1
-        }
-
-        neureset->pauseSession();
-    }
+    // pause session
+    qInfo("Session paused");
+    neureset->pauseSession();
 }
 
 void MainWindow::onStopButtonClicked() {
-    if (eegContactEstablished){
-        // Stop the session
-        if (neureset->isSessionInProgress()) {
-            qInfo("Session ended");
-            neureset->endSession();
-
-            remainingTime = 0;
-            sessionTimer->stop(); // Stop the timer.
-
-            ui->listWidget->clear();
-            ui->listWidget->addItem("Session ended.");
-        }else{
-            qInfo("No Session in Progress");
-        }
-
-        ui->progressBar->setValue(0);
-    }
-
+    // Stop the session
+    qInfo("Session ended");
+    neureset->endSession();
+    //greenTreatmentSignal(); //just testing here
 }
+
 
 void MainWindow::handleEEGHeadsetPanel() {
     QPushButton *button = qobject_cast<QPushButton*>(sender());
@@ -347,50 +273,17 @@ void MainWindow::handleEEGHeadsetPanel() {
     if (button == ui->establishContactButton) {
         // Logic for establishing contact with EEG headset
         qInfo("Establishing contact with EEG headset...");
-        eegContactEstablished = true;
 
         // Enable the lose contact button
         ui->loseContactButton->setEnabled(true);
         ui->establishContactButton->setEnabled(false);
 
-        if (neureset->isSessionInProgress()) {
-            onStartButtonClicked(); //Resume
-        }
-
-        // If contact is reestablished, stop flashing
-        if (flashTimer && flashTimer->isActive()) {
-            flashTimer->stop();
-            // Set the contactLostLight back to dull red
-            ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-        }
-
-
     } else if (button == ui->loseContactButton) {
         // Logic for losing contact with EEG headset
         qInfo("Losing contact with EEG headset...");
-        eegContactEstablished = false;
         ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
+        ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // brighter red
 
-        onPauseButtonClicked(); // pause session
-        
-        if (neureset->isSessionInProgress()) {
-            // Flash red light until contact is reestablished
-            ui->contactLight->setStyleSheet("background-color: #e4f0fa;"); // dull blue
-            ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // bright red
-
-            // Toggle between dull and bright red using a QTimer
-            flashTimer = new QTimer(this);
-            connect(flashTimer, &QTimer::timeout, this, [=]() {
-                static bool brightRed = false;
-                if (brightRed) {
-                    ui->contactLostLight->setStyleSheet("background-color: #ffcccf;"); // dull red
-                } else {
-                    ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // bright red
-                }
-                brightRed = !brightRed;
-            });
-            flashTimer->start(500); // Flashing interval
-        }
         // Enable the establish contact button
         ui->establishContactButton->setEnabled(true);
         ui->loseContactButton->setEnabled(false);
@@ -403,42 +296,8 @@ void MainWindow::timerLabel() {
     showTimer = true;
 
     ui->listWidget->clear();
-    QString timeRemaining = ("Neureset Device is On.");
+    QString timeRemaining = ("Time Remaining");
     ui->listWidget->addItem(timeRemaining);
-}
-
-void MainWindow::updateTimerLabel() {
-    if (powerOn && showTimer && neureset->isSessionInProgress()){  
-        //qInfo("updateTimerLabel");
-        //qInfo("Paused? %s", neureset->isSessionPaused() ? "true" : "false");
-
-        ui->listWidget->clear();
-        QString timeRemainingStr;      
-        //QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
-
-        // Check if the session is paused
-        if (!neureset->isSessionPaused()){
-            // Session is not paused, update remaining time normally
-            
-            // Get remaining time in milliseconds
-            int remainingTimeMs = sessionTimer->remainingTime();
-            int remainingTimeSec = remainingTimeMs / 1000;
-
-            // Convert milliseconds to seconds
-            timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
-
-        }else{
-            // Session is paused, use previously calculated remainingTime
-            //qInfo("Paused time: %d", remainingTime);
-
-            // Update the timer label with the remaining seconds at paused
-            timeRemainingStr = QString("Time Remaining: %1 seconds").arg((remainingTime / 1000));
-            ui->listWidget->addItem("Session paused.");
-
-        }
-
-        ui->listWidget->addItem(timeRemainingStr);
-    }
 }
 
 
@@ -468,9 +327,9 @@ void MainWindow::toggleMenuVisibility() {
     ui->listWidget->clear();
     ui->dateTimeEdit->hide();
     ui->updateDateTimeButton->hide();
+
     if (!showMenuOptions) {
         showDateTimeEditActive = false;  
-        showTimer = false;
 
         // Define alternating colors
         QColor color1(235, 235, 235); // Light gray
@@ -502,6 +361,8 @@ void MainWindow::updateProgress(int progress){
         // Reset the stylesheet to default if the progress is not 100%
         ui->progressBar->setStyleSheet("");
     }
+
+    // lose 1/3 of a progress. 
 
 }
 
@@ -537,24 +398,11 @@ void MainWindow::deviceOff(){
 
 void MainWindow::uploadPCButtonClicked() {
     qInfo("Upload Data to PC");
-
-    // create pc
-    PCWindow* pc = new PCWindow(neureset, this);
-    pc->show();
 }
 
 void MainWindow::showWaveformButtonClicked() {
     qInfo("Show Waveform");
-}
+    SliderWindow* windowSlider= new SliderWindow(neureset->getElectrodes());
+    windowSlider->show();
 
-void MainWindow::pauseTimerElapsed() {
-    qInfo("Session Cancelled. EEG Headset contact was not restablished");
-
-    remainingTime = 0;
-    sessionTimer->stop(); // Stop the timer.
-
-    ui->listWidget->clear();
-    ui->listWidget->addItem("Session ended.");
-    
-    deviceOff();
 }
