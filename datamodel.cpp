@@ -68,9 +68,9 @@ QVariant DataModel::headerData(int header, Qt::Orientation orientation, int role
 }
 
 bool DataModel::insertRows(int row, int count, const QModelIndex &parent){
-
-    beginInsertRows(parent, row, row + count - 1);
-    ROWS = db.countSessions();
+    int add = db.countSessions() - row;
+    beginInsertRows(parent, row, row + add - 1);
+    ROWS += add;
     endInsertRows();
 
     return true;

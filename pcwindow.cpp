@@ -69,9 +69,10 @@ void PCWindow::handleTransfer() {
 
     bool r = transferWindow->getResponse();
     if (r) {
+        int a = model.rowCount();
+        int count = pc->getSessionLogsBuf()->count();
         pc->commitToDb();
-        model.insertRows(0,0,QModelIndex());
-//        model.insertRows(a, pc->getSessionLogsBuf()->count(), QModelIndex());
+        model.insertRows(a, count, QModelIndex());
         qInfo("Done");
     }
     else {
