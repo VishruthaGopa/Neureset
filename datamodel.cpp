@@ -18,6 +18,14 @@ QVariant DataModel::data( const QModelIndex &index, int role) const {
 
     int i = index.row();
 
+    // check if the index is valid
+    if( i < 0 || i >= data->size() ){
+        qDebug() << "INDEX IS NOT VALID. UPDATE ABORTED.";
+        qDebug() << "INDEX SHOWN: " << i;
+        qDebug() << "SIZE OF DATA: " << data->size();
+        return QVariant();
+    }
+
     switch(role){
         case Qt::DisplayRole:
 //            return QString("Row%1, Column%2").arg(index.row() + 1).arg(index.column()+1);
@@ -62,7 +70,7 @@ QVariant DataModel::headerData(int header, Qt::Orientation orientation, int role
 bool DataModel::insertRows(int row, int count, const QModelIndex &parent){
 
     beginInsertRows(parent, row, row + count - 1);
-    ROWS += count;
+    ROWS = db.countSessions();
     endInsertRows();
 
     return true;
