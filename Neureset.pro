@@ -21,6 +21,7 @@ SOURCES += \
     dbmanager.cpp \
     pc.cpp \
     pcwindow.cpp \
+    sliderwindow.cpp \
     transferwindow.cpp
 
 HEADERS += \
@@ -34,11 +35,13 @@ HEADERS += \
     dbmanager.h \
     pc.h \
     pcwindow.h \
+    sliderwindow.h \
     transferwindow.h
 
 FORMS += \
     mainwindow.ui \
     pcwindow.ui \
+    sliderwindow.ui \
     transferwindow.ui
 
 # Default rules for deployment.

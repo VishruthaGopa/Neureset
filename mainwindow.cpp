@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "sliderwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -545,6 +546,9 @@ void MainWindow::uploadPCButtonClicked() {
 
 void MainWindow::showWaveformButtonClicked() {
     qInfo("Show Waveform");
+    SliderWindow* windowSlider= new SliderWindow(neureset->getElectrodes());
+    windowSlider->show();
+
 }
 
 void MainWindow::pauseTimerElapsed() {

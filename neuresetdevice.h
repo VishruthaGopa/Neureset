@@ -53,6 +53,8 @@ public:
     bool isSessionInProgress() const { return sessionInProgress; }
     bool isSessionPaused() const { return sessionPaused; }
 
+    QVector<Electrode*> getElectrodes(){return eegHeadset->getElectrodes();}
+
 
 signals:
      void sessionProgress(int percentage);

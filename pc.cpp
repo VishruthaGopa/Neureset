@@ -8,9 +8,17 @@ PC::PC(NeuresetDevice* nd, QObject *parent): QObject{parent}{
 }
 
 void PC::retrieveSessions() {
-    // store sessions in temporary buffer, retrieved from Neureset device
+    // store sessions in temporary buffer, retrieved from Neureset device or from provided argument
     sessionLogsBuf = new QList<Session*>;
-    *sessionLogsBuf = device->getSessionLog()->getSessionHistory();
+
+    QList<Session*> sessions = device->getSessionLog()->getSessionHistory();
+
+    if (sessions.length() != 0) {
+        *sessionLogsBuf = sessions;
+    }
+    else {
+        *sessionLogsBuf = device->getSessionLog()->getSessionHistory();
+    }
 }
 
 void PC::cancelCommit() {

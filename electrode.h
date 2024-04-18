@@ -26,10 +26,12 @@ private:
     double timeElapsed;
     double samplingFrequency; // Sampling frequency
     double duration; // Duration of the waveform
-    std::vector<double> waveform; // Alpha brain wave generated
+    std::vector<double> waveform;
     QtCharts::QChartView *chartView;
     QtCharts::QChart *chart;
     QtCharts::QLineSeries *series;
+    std::vector<double> Beforewaveform;
+    std::vector<double> Afterwaveform;
 
 public:
     const double PI = 3.14159265358979323846;
@@ -64,7 +66,7 @@ public:
 
     void generateBrainWaveFrequency();
     double calculateDominantFrequency();
-    void plotWaveform() ;
+    QtCharts::QChartView* plotWaveform(bool);
     void generateFromBaseline();
 signals:
     void treatmentApplied(double fre);

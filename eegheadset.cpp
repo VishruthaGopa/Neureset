@@ -58,7 +58,7 @@ void EEGHeadset::startTreatment(double frequency) {
 
 void EEGHeadset::startMeasurement() {
    measurementInProgress = true;
-   wait(5);
+   wait(4.7);
    if (!paused) {
        QFutureSynchronizer<void> synchronizer;
        for (int i = currElectrodeMeasurement - 1; i < electrodeSites.size(); ++i) {
@@ -70,7 +70,7 @@ void EEGHeadset::startMeasurement() {
    }
 }
 
-void EEGHeadset::wait(int sec) {
+void EEGHeadset::wait(double sec) {
    QEventLoop loop;
    QTimer::singleShot(1000*sec, &loop, &QEventLoop::quit); // Wait for seconds
    loop.exec();
@@ -133,7 +133,6 @@ void EEGHeadset::handleTreatmentApplied(double frequency) {
    if (!paused) {
        afterFrequencies.append(frequency);
        if(afterFrequencies.size()%21==0){
-           wait(1);
            emit treatmentCompleted(currStage);
            currElectrodeTreatment= 1;
            treatmentInProgress=false;

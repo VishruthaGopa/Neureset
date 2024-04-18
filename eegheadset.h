@@ -43,7 +43,7 @@ public:
     void handleBaseline(double frequency);
     void handleTreatmentApplied(double frequency);
     //handle required timing
-    void wait(int seconds);
+    void wait(double seconds);
     void pauseSession();
     void startTreatment(double frequency);
     void resumeSession();
@@ -52,6 +52,7 @@ public:
     // Function to calculate FFT and return dominant frequency
     double calculateDominantFrequency(const QVector<double> &frequencies);
     void cancelSession();
+     QVector<Electrode*> getElectrodes(){return electrodeSites;}
 
 
 signals:
