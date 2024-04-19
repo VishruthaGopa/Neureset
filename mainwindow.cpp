@@ -409,36 +409,54 @@ void MainWindow::timerLabel() {
 }
 
 void MainWindow::updateTimerLabel() {
-    if (powerOn && showTimer && neureset->isSessionInProgress()){  
+    if (powerOn && showTimer){   //  && neureset->isSessionInProgress() -> this causes the timer to stop even though there a couple seconds left.
+        QString timeRemainingStr;      
         //qInfo("updateTimerLabel");
         //qInfo("Paused? %s", neureset->isSessionPaused() ? "true" : "false");
+        if (neureset->isSessionInProgress()){
+            ui->listWidget->clear();
+            //QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
 
-        ui->listWidget->clear();
-        QString timeRemainingStr;      
-        //QString timeRemaining = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+            // Check if the session is paused
+            if (!neureset->isSessionPaused()){
+                // Session is not paused, update remaining time normally
+                
+                // Get remaining time in milliseconds
+                int remainingTimeMs = sessionTimer->remainingTime();
+                int remainingTimeSec = remainingTimeMs / 1000;
 
-        // Check if the session is paused
-        if (!neureset->isSessionPaused()){
-            // Session is not paused, update remaining time normally
-            
+                // Convert milliseconds to seconds
+                timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+
+            }else{
+                // Session is paused, use previously calculated remainingTime
+                //qInfo("Paused time: %d", remainingTime);
+
+                // Update the timer label with the remaining seconds at paused
+                timeRemainingStr = QString("Time Remaining: %1 seconds").arg((remainingTime / 1000));
+                ui->listWidget->addItem("Session paused.");
+
+            }
+
+            ui->listWidget->addItem(timeRemainingStr);
+
+        }else{
+            ui->listWidget->clear();
             // Get remaining time in milliseconds
             int remainingTimeMs = sessionTimer->remainingTime();
             int remainingTimeSec = remainingTimeMs / 1000;
 
-            // Convert milliseconds to seconds
-            timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
-
-        }else{
-            // Session is paused, use previously calculated remainingTime
-            //qInfo("Paused time: %d", remainingTime);
-
-            // Update the timer label with the remaining seconds at paused
-            timeRemainingStr = QString("Time Remaining: %1 seconds").arg((remainingTime / 1000));
-            ui->listWidget->addItem("Session paused.");
-
+            if (remainingTimeSec != 0){
+                timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+                ui->listWidget->addItem(timeRemainingStr);
+            }else{
+                timeRemainingStr = QString("Time Remaining: %1 seconds").arg(remainingTimeSec);
+                ui->listWidget->addItem(timeRemainingStr);
+                sessionTimer->stop();
+            }
         }
 
-        ui->listWidget->addItem(timeRemainingStr);
+
     }
 }
 
