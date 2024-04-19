@@ -303,7 +303,6 @@ void MainWindow::onStartButtonClicked() {
 }
 
 void MainWindow::onPauseButtonClicked() {
-    if (eegContactEstablished){
         // pause session
         if (neureset->isSessionInProgress()) {
             qInfo("Session paused");
@@ -318,7 +317,7 @@ void MainWindow::onPauseButtonClicked() {
         }
 
         neureset->pauseSession();
-    }
+    
 }
 
 void MainWindow::onStopButtonClicked() {
