@@ -94,8 +94,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(batteryCheckTimer, &QTimer::timeout, this, &MainWindow::checkBatteryLevel);
     batteryCheckTimer->start(1000); // Check battery level every 5 seconds
 
-    // Initialize sessionTimer
+    // Initialize sessionTimer and flashTimer
     sessionTimer = new QTimer(this);
+    flashTimer = new QTimer(this);
 
     // Set up the countdownTimer
     QTimer *countdownTimer = new QTimer(this);
@@ -379,7 +380,6 @@ void MainWindow::handleEEGHeadsetPanel() {
             ui->contactLostLight->setStyleSheet("background-color: #FF000D;"); // bright red
 
             // Toggle between dull and bright red using a QTimer
-            flashTimer = new QTimer(this);
             connect(flashTimer, &QTimer::timeout, this, [=]() {
                 static bool brightRed = false;
                 if (brightRed) {
