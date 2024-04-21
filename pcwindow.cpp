@@ -20,16 +20,14 @@ PCWindow::PCWindow(NeuresetDevice* nd, QWidget *parent)
 
 }
 
-PCWindow::~PCWindow() { 
-    delete ui; 
-    delete pc;
-}
+PCWindow::~PCWindow() { delete ui; }
 
 void PCWindow::setUpTable(){
 
     // bind to table view
     ui->table->setModel(&model);
     ui->table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->table->setSelectionBehavior( QAbstractItemView::SelectRows );
 
 }
 
@@ -45,6 +43,26 @@ void PCWindow::handleConnect(){
 }
 
 void PCWindow::handleTransfer() {
+
+    // this grabs from neureset device
+    // pc->retrieveSessions();
+
+    // test
+//    Session* s = new Session();
+//    Session* s2 = new Session();
+//    s->startTimer();
+//    s->endTimer();
+//    s->setBeforeBaseline(69);
+//    s->setAfterBaseline(420);
+//    s2->startTimer();
+//    s2->endTimer();
+//    s2->setBeforeBaseline(727);
+//    s2->setAfterBaseline(727);
+//    QList<Session*> list;
+//    list.append(s);
+//    list.append(s2);
+//    pc->retrieveSessions(&list);
+    // end hard code
     pc->retrieveSessions();
     TransferWindow* transferWindow = new TransferWindow(this);
     transferWindow->displaySessions(pc->getSessionLogsBuf());

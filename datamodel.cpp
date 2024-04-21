@@ -64,6 +64,10 @@ QVariant DataModel::headerData(int header, Qt::Orientation orientation, int role
         }
     }
 
+    if( role == Qt::DisplayRole && orientation == Qt::Vertical ){
+        return header + 1;
+    }
+
     return QVariant();
 }
 
