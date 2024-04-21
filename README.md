@@ -1,6 +1,6 @@
 # Neureset Device Simulator
 
-**Contributors:** Caitlin Wardle, Daemon Gee, Vishrutha Gopa, Mion Keenan and Ada Huang
+**Contributors:** Caitlin Wardle, Damon Gee, Vishrutha Gopa, Mion Keenan and Ada Huang
 
 ## Prerequisites
 To display the waveform, our project utilizes the `QTCharts` library, which has been approved by our professor for this purpose. To install `QTCharts` on your local machine, execute the following command in the terminal:
