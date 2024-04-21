@@ -1,35 +1,12 @@
 # Neureset Device Simulator
 
-### Contributors: Caitlin Wardle, Daemon Gee, Vishrutha Gopa, Mion Keenan and Ada Huang
+**Contributors:** Caitlin Wardle, Daemon Gee, Vishrutha Gopa, Mion Keenan and Ada Huang
 
 ## Prerequisites
 To display the waveform, our project utilizes the `QTCharts` library, which has been approved by our professor for this purpose. To install `QTCharts` on your local machine, execute the following command in the terminal:
 ```
 sudo apt install libqt5charts5-dev
 ```
-
-## Division of Labor:
-
-### Caitlin:
-  - Neureset classes: `NeuresetDevice`, `EEGHeadset`, `Electrode`, `Session`, `SessionLog`.
-  - Sequence Diagrams.
-  - Use Cases.
-
-### Ada:  
-  - PC Database classes: `DataModel`, `DBManager`, `PC Window`.
-  - Design Decisions.
-
-### Mion:
-  - PC Classes: `PC`, `TransferWindow`.
-  - Traceability Matrix.
-
-### Vishrutha:
-  - Main UI: `MainWindow`, `UI (MainWindow.ui)`.
-  - UML Class Diagram.
-
-### Damon:
-  - General Research.
-  - State Diagrams.
 
 ## Organization of Project Code:
 - **EEGHeadset:** Controls the 21 Electrodes and handles the returns baselines of Electrodes and overall Baseline Calculation.
@@ -52,4 +29,14 @@ sudo apt install libqt5charts5-dev
 - Sequence Diagrams
 - Traceability Matrix
 
-**Video Link:**
+## Video Demonstration:
+[ ADD YOUTUBE LINK ]
+
+## Contributions:
+|  |                                                                                                        |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| Caitlin     | - Neureset classes: `NeuresetDevice`, `EEGHeadset`, `Electrode`, `Session`, `SessionLog`. <br> - Sequence Diagrams. <br> - Use Cases. |
+| Ada         | - PC classes: `DataModel`, `DBManager`, `PC Window`. <br> - Design Decisions.                            |
+| Mion        | - PC classes: `PC`, `TransferWindow`. <br> - Traceability Matrix.                                                  |
+| Vishrutha   | - Main UI: `MainWindow`, `UI (MainWindow.ui)`. <br> - UML Class Diagram.                                           |
+| Damon       | - General Research. <br> - State Diagrams.                                                                          |
