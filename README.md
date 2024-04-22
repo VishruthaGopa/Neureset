@@ -45,7 +45,7 @@ Alternatively, you may also just try deleting the `Neureset.pro.user` file, clea
 - Traceability Matrix
 
 ## Video Demonstration:
-https://youtu.be/xwzlRh9NO7U (IMPORTANT: the video uses an older version of the code and includes a bug with the timer display that has since been fixed. Due to a VM issue I was unable to dowload the newest version, but fortunately the differences were minimal and the video demonstrates the necessary functionality. -Damon)
+https://youtu.be/JtuX0hZ1c44
 
 ## Contributions:
 | Team Member | Major Additions to:                                                                                                     |
