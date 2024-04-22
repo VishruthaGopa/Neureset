@@ -8,6 +8,19 @@ To display the waveform, our project utilizes the `QTCharts` library, which has 
 sudo apt install libqt5charts5-dev
 ```
 
+## Instructions
+After ensuring `QTCharts` is installed, to run the Neureset program from Qt Creator, open the project by selecting the `Neureset.pro` file, then build and execute.
+
+Alternatively, to compile Neureset directly from the command-line, enter the project directory and run
+```
+qmake -makefile
+make
+```
+followed by `./Neureset` to execute.
+
+## Troubleshooting
+If building the project from Qt Creator, the compiler may throw `Error while building/deploying project Neureset (kit: Desktop) When executing step "qmake"`. If this happens, go to the "Projects" tab on the left and make sure the "Shadow build" option at the top of the build settings is **unchecked**.
+
 ## Organization of Project Code:
 - **EEGHeadset:** Controls the 21 Electrodes and handles the returns baselines of Electrodes and overall Baseline Calculation.
 - **Electrode:** Controls individual treatments, waveform generation/display, baseline calculation from waveform.
