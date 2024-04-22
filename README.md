@@ -21,6 +21,8 @@ followed by `./Neureset` to execute.
 ## Troubleshooting
 If building the project from Qt Creator, the compiler may throw `Error while building/deploying project Neureset (kit: Desktop) When executing step "qmake"`. If this happens, go to the "Projects" tab on the left and make sure the "Shadow build" option at the top of the build settings is **unchecked**.
 
+Alternatively, you may also just try deleting the `Neureset.pro.user` file, clean, and attempting to build again. 
+
 ## Organization of Project Code:
 - **EEGHeadset:** Controls the 21 Electrodes and handles the returns baselines of Electrodes and overall Baseline Calculation.
 - **Electrode:** Controls individual treatments, waveform generation/display, baseline calculation from waveform.
