@@ -45,7 +45,7 @@ Alternatively, you may also just try deleting the `Neureset.pro.user` file, clea
 - Traceability Matrix
 
 ## Video Demonstration:
-https://youtu.be/JtuX0hZ1c44
+https://youtu.be/JtuX0hZ1c44 (NOTE: The video includes a couple bugs in the timer display and progress bar, which are likely unique to my VM. I've experienced quite a few VM issues, and that's probably the cause, because it works fine for everyone else. -Damon)
 
 ## Contributions:
 | Team Member | Major Additions to:                                                                                                     |
