@@ -30,7 +30,7 @@ sudo apt install libqt5charts5-dev
 - Traceability Matrix
 
 ## Video Demonstration:
-_
+https://youtu.be/xwzlRh9NO7U (IMPORTANT: the video uses an older version of the code and includes a few bugs that have since been fixed)
 
 ## Contributions:
 |  |                                                                                                        |
